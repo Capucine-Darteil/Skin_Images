@@ -160,7 +160,5 @@ cython_debug/
 #.idea/
 
 # Project Dir
-drafts/assets/*
-drafts/data/*
-drafts/notebooks/*
+drafts/*
 raw_data/*
