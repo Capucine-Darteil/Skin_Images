@@ -3,6 +3,9 @@ import numpy as np
 from skimage import io
 from pathlib import Path
 import cv2
+import os
+
+SIZE = os.environ.get('SIZE')
 
 # Exemple chemin  : '/home/auguste/code/Capucine-Darteil/Skin_Images/raw_data/HAM10000_images_part_1'
 
@@ -23,10 +26,10 @@ def merge_dicts(dict_1, dict_2):
     return images_dict
 
 # Modifier la taille des images
-def resize_data(data, size):
+def resize_data(data):
     resized_data = {}
     for key, image in data.items():
-        resized_image = cv2.resize(image, (size,size))
+        resized_image = cv2.resize(image, (SIZE,SIZE))
         resized_data[key] = resized_image
 
     return resized_data
