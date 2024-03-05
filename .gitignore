@@ -162,3 +162,7 @@ cython_debug/
 # Project Dir
 drafts/*
 raw_data/*
+
+
+.DS_Store
+.python-version
