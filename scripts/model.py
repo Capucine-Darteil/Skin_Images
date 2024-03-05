@@ -80,7 +80,7 @@ def train_model(
         X: np.ndarray,
         y: np.ndarray,
         batch_size=256,
-        patience=30,
+        patience=10,
         validation_data=None, # overrides validation_split
         validation_split=0.3):
     """
@@ -101,7 +101,7 @@ def train_model(
         epochs=100,
         batch_size=batch_size,
         callbacks=[es],
-        verbose=0
+        verbose=1
     )
 
     return model, history

@@ -14,12 +14,14 @@ def drop_columns(df):
 
 # Labels between 1 (malign) and 0 (benign)
 def labelize(df):
+
     benign_classes = [4,2,3]
     for i in range(1,df.shape[0]+1):
-        if df['label'][i-1] in benign_classes:
-            df ['label'][i-1] = 0
+        if df['dx'][i-1] in benign_classes:
+            df.loc[i-1, "dx"] = 0
+            #new_df ['dx'][i-1] = 0
         else:
-            df['label'][i-1] = 1
+            df.loc[i-1, "dx"] = 1
     return df
 
 # Splits into a SAMPLE_SIZE% sample
