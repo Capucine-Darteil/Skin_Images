@@ -163,6 +163,5 @@ cython_debug/
 drafts/*
 raw_data/*
 
-
 .DS_Store
 .python-version
