@@ -15,7 +15,6 @@ def load_data(CHEMIN_1,CHEMIN_2,CHEMIN_METADATA):
     data = resize_data(data)
     df = flat_images(data)
     df = df_final(CHEMIN_METADATA,df)
-    print(df.head())
     return df
 
 if __name__ == '__main__':
