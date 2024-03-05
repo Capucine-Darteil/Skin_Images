@@ -4,7 +4,7 @@ SAMPLE_SIZE = os.environ.get('SAMPLE_SIZE',0.5)
 # Labels between 1 (malign) and 0 (benign)
 def labelize(df):
     benign_classes = [4,2,3]
-    for i in range(1,10016):
+    for i in range(1,df.shape[0]+1):
         if df['label'][i-1] in benign_classes:
             df ['label'][i-1] = 0
         else:
