@@ -15,11 +15,14 @@ def get_data(chemin):
     data = {}
     for i in range(len(paths1)):
         data[paths1[i][0][:-4]] = io.imread(f'chemin/{paths1[i][0]}')
-
-
     return data
 
+# Concatener les dictionnaires d'images. Un dictionnaire par dossier avec des images.
+def merge_dicts(dict_1, dict_2):
+    images_dict = dict_1.upload(dict_2)
+    return images_dict
 
+# Modifier la taille des images
 def resize_data(data, size):
     resized_data = {}
     for key, image in data.items():
@@ -27,3 +30,19 @@ def resize_data(data, size):
         resized_data[key] = resized_image
 
     return resized_data
+
+# Reshape data et transformer en DataFrame:
+def flat_images(data):
+    flat_data = {}
+    for key, image in data.items():
+        flat_image = image.flatten()
+        flat_data[key] = flat_image
+
+    df_images = pd.DataFrame(flat_data).transpose()
+    return df_images
+
+def df_final(chemin, df_images):
+    metadf = pd.read_csv(chemin)
+    metadf = metadf.set_index('image_id')
+    df = pd.concat([metadf,df_images],axis=1)
+    return df
