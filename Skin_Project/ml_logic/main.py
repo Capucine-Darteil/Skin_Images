@@ -1,4 +1,3 @@
-from ml_logic.preprocess import categorize, drop_columns, labelize
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.compose import make_column_transformer
 import pandas as pd
@@ -9,7 +8,7 @@ from tensorflow import keras
 from keras import Model, Sequential, layers, regularizers, optimizers, callbacks
 from sklearn.model_selection import train_test_split
 from model import initialize_dumb_model, compile_model, train_model, evaluate_model, initialize_model
-from Skin_Project.ml_logic.preprocess import labelize, sampler, drop_columns, categorize
+from preprocess import labelize, sampler, drop_columns, categorize
 IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
 CHEMIN_3 = os.environ.get('CHEMIN_3')
 
@@ -23,10 +22,10 @@ def preproc(df_sample, dx):
 
 def train():
     df = pd.read_csv(CHEMIN_3, index_col=0)
-    df = categorize(df)
-    print('df categorized')
-    df = drop_columns(df)
-    print('columns dropped')
+    #df = categorize(df)
+    #print('df categorized')
+    #df = drop_columns(df)
+    #print('columns dropped')
     df_labelized= labelize(df)
     print('labelized ok')
 
