@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from model import initialize_dumb_model, compile_model, train_model, evaluate_model, initialize_model
 from preprocess import labelize, sampler
 IMAGE_SIZE = os.environ.get('IMAGE_SIZE',64)
+CHEMIN_3 = os.environ.get('CHEMIN_3')
 
 
 def preproc(df_sample, dx):
@@ -20,7 +21,7 @@ def preproc(df_sample, dx):
 
 
 def dumb_predict():
-    df_sample = pd.read_csv("/Users/capucinedarteil/code/Capucine-Darteil/Skin_Images/raw_data/sample.csv", index_col=0)
+    df_sample = pd.read_csv(CHEMIN_3, index_col=0)
     preprocess = preproc(df_sample, 'label')
     df_processed = pd.DataFrame(preprocess.fit_transform(df_sample), columns = preprocess.get_feature_names_out())
 
@@ -46,7 +47,7 @@ def dumb_predict():
 
 
 def train():
-    df = pd.read_csv('/Users/tomas.miranda/code/Capucine-Darteil/Skin_Images/raw_data/df_complet_64x64.csv', index_col=0)
+    df = pd.read_csv(CHEMIN_3, index_col=0)
     df_labelized= labelize(df)
     print('labelized ok')
 
@@ -76,7 +77,7 @@ def train():
     model, history = train_model(model, X_train,y_train)
     print('model trained!')
 
-    metrics = evaluate_model(model)
+    metrics = evaluate_model(model, X_test, y_test)
 
     print(f'loss is {metrics["loss"]}')
     print(f'accuracy is {metrics["accuracy"]}')
