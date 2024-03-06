@@ -53,3 +53,8 @@ def df_final(CHEMIN_METADATA, df_images):
     df = pd.concat([metadf,df_images],axis=1)
     df = df.reset_index(drop=False)
     return df
+
+
+def upload_df(df, IMAGE_SIZE):
+    df.to_csv(f'df_complet_{IMAGE_SIZE}x{IMAGE_SIZE}.csv', index=False)
+    pass
