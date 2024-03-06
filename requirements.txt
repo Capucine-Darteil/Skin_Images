@@ -11,3 +11,4 @@ tensorflow
 pathlib
 scikit-image
 opencv-python
+mlflow
