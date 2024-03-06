@@ -70,7 +70,8 @@ def compile_model(model: Model) -> Model:
     optimizer = optimizers.Adam()
     model.compile(loss='binary_crossentropy',
               optimizer=optimizer,
-              metrics=['accuracy',tf.keras.metrics.Recall(),tf.keras.metrics.Precision()])
+              metrics=['accuracy',tf.keras.metrics.Recall(),tf.keras.metrics.Precision(),
+                       tf.keras.metrics.F1Score(), tf.keras.metrics.R2Score(), tf.keras.metrics.AUC()])
 
     return model
 
