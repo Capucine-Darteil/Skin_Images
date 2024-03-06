@@ -9,9 +9,8 @@ from keras import Model, Sequential, layers, regularizers, optimizers, callbacks
 from sklearn.model_selection import train_test_split
 from model import initialize_dumb_model, compile_model, train_model, evaluate_model, initialize_model
 from preprocess import labelize, sampler
-IMAGE_SIZE = os.environ.get('IMAGE_SIZE',64)
+IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
 CHEMIN_3 = os.environ.get('CHEMIN_3')
-
 
 def preproc(df_sample, dx):
     preproc = make_column_transformer(

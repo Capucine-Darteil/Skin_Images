@@ -1,5 +1,5 @@
 import os
-SAMPLE_SIZE = os.environ.get('SAMPLE_SIZE',0.5)
+SAMPLE_SIZE = float(os.environ.get('SAMPLE_SIZE',0.5))
 
 # Replace mole type with a number
 def categorize(df):
