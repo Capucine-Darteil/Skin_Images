@@ -4,7 +4,7 @@ import tensorflow as tf
 from keras import Model, Sequential, layers, optimizers, callbacks
 import os
 
-IMAGE_SIZE = os.environ.get('IMAGE_SIZE',64)
+IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
 
 def initialize_dumb_model():
     model = Sequential()
