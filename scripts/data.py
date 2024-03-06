@@ -5,7 +5,7 @@ from pathlib import Path
 import cv2
 import os
 
-IMAGE_SIZE = os.environ.get('SIZE')
+IMAGE_SIZE = os.environ.get('IMAGE_SIZE')
 CHEMIN_1 = os.environ.get('CHEMIN_1')
 CHEMIN_2 = os.environ.get('CHEMIN_2')
 CHEMIN_METADATA = os.environ.get('CHEMIN_METADATA')
@@ -29,7 +29,7 @@ def merge_dicts(dict_1, dict_2):
     return dict_1
 
 # Modifier la taille des images
-def resize_data(data):
+def resize_data(data,IMAGE_SIZE):
     resized_data = {}
     for key, image in data.items():
         resized_image = cv2.resize(image, (IMAGE_SIZE,IMAGE_SIZE))
