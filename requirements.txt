@@ -11,3 +11,9 @@ tensorflow
 pathlib
 scikit-image
 opencv-python
+fastapi
+uvicorn
+httpx
+python-multipart
+streamlit
+pillow
