@@ -2,7 +2,10 @@ import numpy as np
 
 import tensorflow as tf
 from keras import Model, Sequential, layers, optimizers, callbacks
+from sklearn.metrics import accuracy_score, precision_score, recall_score, fbeta_score
 import os
+import pandas as pd
+from params import *
 
 IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
 
@@ -108,6 +111,7 @@ def train_model(
     return model, history
 
 
+'''old evaluate
 def evaluate_model(
         model: Model,
         X: np.ndarray,
@@ -129,4 +133,17 @@ def evaluate_model(
         # callbacks=None,
         return_dict=True)
 
-    return metrics
+    return metrics'''
+
+def evaluate_model(model,X_test,y_test,threshold):
+    y_pred = model.predict(X_test)
+    threshold = threshold
+    y_binary_predictions = (y_pred > threshold).astype(int)
+    accuracy = accuracy_score(y_test, y_binary_predictions)
+    precision = precision_score(y_test, y_binary_predictions)
+    recall = recall_score(y_test, y_binary_predictions)
+    f2 = fbeta_score(y_test, y_binary_predictions,beta = 2.0)
+
+    metrics_dict = {'Threshold':threshold,'Accuracy':accuracy, 'Precision':precision, 'Recall':recall, 'F2 Score':f2}
+    df_metrics = pd.DataFrame(metrics_dict,index=[threshold])
+    return df_metrics
