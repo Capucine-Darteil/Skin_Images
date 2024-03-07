@@ -11,7 +11,7 @@ from model import initialize_dumb_model, compile_model, train_model, evaluate_mo
 from preprocess import labelize, sampler, drop_columns, categorize
 IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
 CHEMIN_3 = os.environ.get('CHEMIN_3')
-
+THRESHOLD = float(os.environ.get('THRESHOLD'))
 
 def preproc(df_sample, dx):
     preproc = make_column_transformer(
@@ -55,7 +55,7 @@ def train():
     model, history = train_model(model, X_train,y_train)
     print('model trained!')
 
-    metrics = evaluate_model(model, X_test, y_test)
+    metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
 
     #print(f'loss is {metrics["loss"]}')
     #print(f'accuracy is {metrics["accuracy"]}')
