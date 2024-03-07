@@ -5,9 +5,11 @@ from keras import Model, Sequential, layers, optimizers, callbacks
 from sklearn.metrics import accuracy_score, precision_score, recall_score, fbeta_score
 import os
 import pandas as pd
-from params import *
+import Skin_Project.params
 
 IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
+THRESHOLD = float(os.environ.get('THRESHOLD'))
+
 
 def initialize_dumb_model():
     model = Sequential()
@@ -74,7 +76,7 @@ def compile_model(model: Model) -> Model:
     model.compile(loss='binary_crossentropy',
               optimizer=optimizer,
               metrics=['accuracy',tf.keras.metrics.Recall(),tf.keras.metrics.Precision()
-                       , tf.keras.metrics.F1Score(), tf.keras.metrics.R2Score(), tf.keras.metrics.AUC()])
+                       , tf.keras.metrics.FBetaScore(beta=2.0)])
 
     return model
 
@@ -137,7 +139,7 @@ def evaluate_model(
 
 def evaluate_model(model,X_test,y_test,threshold):
     y_pred = model.predict(X_test)
-    threshold = threshold
+    threshold = THRESHOLD
     y_binary_predictions = (y_pred > threshold).astype(int)
     accuracy = accuracy_score(y_test, y_binary_predictions)
     precision = precision_score(y_test, y_binary_predictions)
