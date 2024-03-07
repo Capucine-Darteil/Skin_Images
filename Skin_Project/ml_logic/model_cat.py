@@ -13,46 +13,50 @@ def initialize_model():
     model = Sequential()
 
   # First convolutional layer
-    model.add(layers.Conv2D(filters = 64, kernel_size = (5,5), padding = "same", activation = "relu", input_shape = (IMAGE_SIZE,IMAGE_SIZE,3)))
+    model.add(layers.Conv2D(filters = 256, kernel_size = (5,5), padding = "same", activation = "relu", input_shape = (IMAGE_SIZE,IMAGE_SIZE,3)))
 
-  # Max pooling layer
+  # Max pooling layer and BatchNormalization layer
     model.add(layers.MaxPool2D(pool_size = (2,2)))
+    #model.add(layers.BatchNormalization())
+
   # Second convolutional layer
+    model.add(layers.Conv2D(filters = 128,
+               kernel_size = (3,3),
+               padding = "same",
+               activation = "relu"))
+
+  # Max pooling layer and BatchNormalization layer
+    model.add(layers.MaxPool2D(pool_size = (2,2)))
+    #model.add(layers.BatchNormalization())
+
+    # Third convolutional layer
     model.add(layers.Conv2D(filters = 64,
                kernel_size = (3,3),
                padding = "same",
                activation = "relu"))
 
-     # Max pooling layer
+  # Max pooling layer and BatchNormalization layer
     model.add(layers.MaxPool2D(pool_size = (2,2)))
-
-    # Third convolutional layer
-    model.add(layers.Conv2D(filters = 32,
-               kernel_size = (3,3),
-               padding = "same",
-               activation = "relu"))
-
-    # Max pooling layer
-    model.add(layers.MaxPool2D(pool_size = (2,2)))
+    #model.add(layers.BatchNormalization())
 
     # Fourth convolutional layer
-    model.add(layers.Conv2D(filters = 256,
-               kernel_size = (3,3),
-               padding = "same",
-               activation = "relu"))
+    #model.add(layers.Conv2D(filters = 256,
+    #           kernel_size = (3,3),
+    #           padding = "same",
+    #           activation = "relu"))
 
-  # Max pooling layer
-    model.add(layers.MaxPool2D(pool_size = (2,2)))
-
+  # Max pooling layer and BatchNormalization layer
+    #model.add(layers.MaxPool2D(pool_size = (2,2)))
+    #model.add(layers.BatchNormalization())
 
     # Flattening layer
     model.add(layers.Flatten())
 
     # Dense layer
-    model.add(layers.Dense(units = 128,
+    model.add(layers.Dense(units = 256,
                 activation = "relu"))
 
-    model.add(layers.Dropout(0.4))
+    model.add(layers.Dropout(0.5))
 
     # Output layer
     model.add(layers.Dense(7, activation='softmax'))
