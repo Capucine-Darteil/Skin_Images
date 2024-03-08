@@ -11,6 +11,7 @@ from Skin_Project.ml_logic.model_cat import compile_model, train_model, evaluate
 from Skin_Project.ml_logic.preprocess import labelize, sampler, drop_columns, categorize
 from keras.utils import to_categorical
 from Skin_Project.params import *
+from Skin_Project.ml_logic.registry import save_model, load_model, load_best_model
 
 
 def preproc(df_sample, dx):
@@ -76,14 +77,46 @@ def train():
     model, history = train_model(model, X_train,y_train)
     print('model trained!')
 
-    metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
+    if CLASSIFICATION == 'local':
+        #Load the best model
+        best_model = load_best_model()
 
-    #print(f'loss is {metrics["loss"]}')
-    #print(f'accuracy is {metrics["accuracy"]}')
-    #print(f'recall is {metrics["recall"]}')
-    #print(f'precision is {metrics["precision"]}')
-    print(metrics)
-    return metrics
+        if best_model == None:
+            if CLASSIFICATION == 'binary':
+                best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
+                model.save(best_model_path)
+                print("First model is saved as best model !")
+                pass
+            if CLASSIFICATION == 'cat':
+                best_model_path = f"{CHEMIN_CAT}/best_model.h5"
+                model.save(best_model_path)
+                print("First model is saved as best model !")
+                pass
+
+        best_metrics = evaluate_model(best_model, X_test, y_test,threshold=THRESHOLD)
+        print(f'ancient metrics are : {best_metrics}')
+
+        metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
+        print(f'new metrics are : {metrics}')
+
+        keys_ =list(metrics.keys())
+
+        if metrics[keys_[2]]>best_metrics['Recall'] and metrics[keys_[1]]>0.5:
+            if CLASSIFICATION == 'binary':
+                best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
+                model.save(best_model_path)
+                print("New best model (binary) !")
+                return metrics
+            if CLASSIFICATION == 'cat':
+                best_model_path = f"{CHEMIN_CAT}/best_model.h5"
+                model.save(best_model_path)
+                print("New best model (multiclass) !")
+                return metrics
+
+        else :
+            print('The new model is not better than the best model, try again ! :(')
+            return best_metrics
+    pass
 
 
 if __name__ == '__main__':
