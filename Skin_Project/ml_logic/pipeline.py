@@ -7,9 +7,9 @@ import tensorflow as tf
 from tensorflow import keras
 from keras import Model, Sequential, layers, regularizers, optimizers, callbacks
 from sklearn.model_selection import train_test_split
-from model import initialize_dumb_model, compile_model, train_model, evaluate_model, initialize_model
-from preprocess import labelize, sampler
-from registry import save_model, load_model, load_best_model
+from Skin_Project.ml_logic.model import initialize_dumb_model, compile_model, train_model, evaluate_model, initialize_model
+from Skin_Project.ml_logic.preprocess import labelize, sampler
+from Skin_Project.ml_logic.registry import save_model, load_model, load_best_model
 from Skin_Project.params import *
 
 def preproc(df_sample, dx):
