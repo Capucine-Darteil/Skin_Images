@@ -4,65 +4,110 @@ from keras import Model, Sequential, layers, optimizers, callbacks
 from sklearn.metrics import accuracy_score, precision_score, recall_score, fbeta_score
 import os
 import pandas as pd
-IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
-THRESHOLD = float(os.environ.get('THRESHOLD'))
-CLASSIFICATION = str(os.environ.get("CLASSIFICATION"))
-
+from Skin_Project.params import *
 
 def initialize_model():
     model = Sequential()
 
-  # First convolutional layer
-    model.add(layers.Conv2D(filters = 256, kernel_size = (5,5), padding = "same", activation = "relu", input_shape = (IMAGE_SIZE,IMAGE_SIZE,3)))
+    if CLASSIFICATION == 'cat':
 
-  # Max pooling layer and BatchNormalization layer
-    model.add(layers.MaxPool2D(pool_size = (2,2)))
-    #model.add(layers.BatchNormalization())
+     # First convolutional layer
+        model.add(layers.Conv2D(filters = 256, kernel_size = (5,5), padding = "same", activation = "relu", input_shape = (IMAGE_SIZE,IMAGE_SIZE,3)))
 
-  # Second convolutional layer
-    model.add(layers.Conv2D(filters = 128,
-               kernel_size = (3,3),
-               padding = "same",
-               activation = "relu"))
+     # Max pooling layer and BatchNormalization layer
+        model.add(layers.MaxPool2D(pool_size = (2,2)))
+        #model.add(layers.BatchNormalization())
 
-  # Max pooling layer and BatchNormalization layer
-    model.add(layers.MaxPool2D(pool_size = (2,2)))
-    #model.add(layers.BatchNormalization())
-
-    # Third convolutional layer
-    model.add(layers.Conv2D(filters = 64,
-               kernel_size = (3,3),
-               padding = "same",
-               activation = "relu"))
-
-  # Max pooling layer and BatchNormalization layer
-    model.add(layers.MaxPool2D(pool_size = (2,2)))
-    #model.add(layers.BatchNormalization())
-
-    # Fourth convolutional layer
-    #model.add(layers.Conv2D(filters = 256,
-    #           kernel_size = (3,3),
-    #           padding = "same",
-    #           activation = "relu"))
-
-  # Max pooling layer and BatchNormalization layer
-    #model.add(layers.MaxPool2D(pool_size = (2,2)))
-    #model.add(layers.BatchNormalization())
-
-    # Flattening layer
-    model.add(layers.Flatten())
-
-    # Dense layer
-    model.add(layers.Dense(units = 256,
+     # Second convolutional layer
+        model.add(layers.Conv2D(filters = 128,
+                kernel_size = (3,3),
+                padding = "same",
                 activation = "relu"))
 
-    model.add(layers.Dropout(0.5))
+     # Max pooling layer and BatchNormalization layer
+        model.add(layers.MaxPool2D(pool_size = (2,2)))
+        #model.add(layers.BatchNormalization())
 
-    # Output layer
-    model.add(layers.Dense(7, activation='softmax'))
+        # Third convolutional layer
+        model.add(layers.Conv2D(filters = 64,
+                kernel_size = (3,3),
+                padding = "same",
+                activation = "relu"))
 
-    return model
+     # Max pooling layer and BatchNormalization layer
+        model.add(layers.MaxPool2D(pool_size = (2,2)))
+        #model.add(layers.BatchNormalization())
 
+        # Fourth convolutional layer
+        #model.add(layers.Conv2D(filters = 256,
+        #           kernel_size = (3,3),
+        #           padding = "same",
+        #           activation = "relu"))
+
+     # Max pooling layer and BatchNormalization layer
+        #model.add(layers.MaxPool2D(pool_size = (2,2)))
+        #model.add(layers.BatchNormalization())
+
+        # Flattening layer
+        model.add(layers.Flatten())
+
+        # Dense layer
+        model.add(layers.Dense(units = 256,
+                    activation = "relu"))
+
+        model.add(layers.Dropout(0.5))
+
+        # Output layer
+        model.add(layers.Dense(7, activation='softmax'))
+
+        return model
+
+    if CLASSIFICATION == 'binary':
+
+        # First convolutional layer
+        model.add(layers.Conv2D(filters = 64, kernel_size = (5,5), padding = "same", activation = "relu", input_shape = (IMAGE_SIZE,IMAGE_SIZE,3)))
+
+        # Max pooling layer
+        model.add(layers.MaxPool2D(pool_size = (2,2)))
+        # Second convolutional layer
+        model.add(layers.Conv2D(filters = 64,
+                kernel_size = (3,3),
+                padding = "same",
+                activation = "relu"))
+
+        # Max pooling layer
+        model.add(layers.MaxPool2D(pool_size = (2,2)))
+
+        # Third convolutional layer
+        model.add(layers.Conv2D(filters = 32,
+                kernel_size = (3,3),
+                padding = "same",
+                activation = "relu"))
+
+        # Max pooling layer
+        model.add(layers.MaxPool2D(pool_size = (2,2)))
+
+        # Fourth convolutional layer
+        model.add(layers.Conv2D(filters = 256,
+                kernel_size = (3,3),
+                padding = "same",
+                activation = "relu"))
+
+        # Max pooling layer
+        model.add(layers.MaxPool2D(pool_size = (2,2)))
+
+
+        # Flattening layer
+        model.add(layers.Flatten())
+
+        # Dense layer
+        model.add(layers.Dense(units = 128,
+                    activation = "relu"))
+
+        # Output layer
+        model.add(layers.Dense(1, activation='sigmoid'))
+
+        return model
 
 
 def compile_model(model: Model) -> Model:
