@@ -1,5 +1,6 @@
 import os
-SAMPLE_SIZE = float(os.environ.get('SAMPLE_SIZE',0.5))
+from Skin_Project.params import *
+import pandas as pd
 
 # Replace mole type with a number
 def categorize(df):
