@@ -4,9 +4,7 @@ import glob
 
 from tensorflow import keras
 #import mlflow
-MODEL_TARGET = os.environ.get("MODEL_TARGET")
-CHEMIN_4 = os.environ.get('CHEMIN_4')
-
+from Skin_Project.params import *
 
 def save_model(model: keras.Model = None) -> None:
     """

@@ -5,11 +5,7 @@ from keras import Model, Sequential, layers, optimizers, callbacks
 from sklearn.metrics import accuracy_score, precision_score, recall_score, fbeta_score
 import os
 import pandas as pd
-import Skin_Project.params
-
-IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
-THRESHOLD = float(os.environ.get('THRESHOLD'))
-
+from Skin_Project.params import *
 
 def initialize_dumb_model():
     model = Sequential()
