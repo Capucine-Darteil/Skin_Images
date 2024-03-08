@@ -14,3 +14,7 @@ THRESHOLD = os.environ.get('THRESHOLD')
 CLASSIFICATION = str(os.environ.get("CLASSIFICATION"))
 SAMPLE_SIZE = float(os.environ.get('SAMPLE_SIZE',0.5))
 MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
+
+MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
+MLFLOW_MODEL_NAME = os.environ.get("MLFLOW_MODEL_NAME")
+MLFLOW_EXPERIMENT = os.environ.get("MLFLOW_EXPERIMENT")
