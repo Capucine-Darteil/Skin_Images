@@ -3,8 +3,9 @@ import os
 import glob
 
 from tensorflow import keras
-#import mlflow
+import mlflow
 from Skin_Project.params import *
+from mlflow.tracking import MlflowClient
 
 def save_model(model: keras.Model = None) -> None:
     """
@@ -19,6 +20,17 @@ def save_model(model: keras.Model = None) -> None:
     model_path = os.path.join(CHEMIN_4, f"{timestamp}.h5")
     model.save(model_path)
     print("Model saved locally")
+
+    if MODEL_TARGET == "mlflow":
+        mlflow.tensorflow.log_model(
+            model=model,
+            artifact_path="model",
+            registered_model_name="skin project model"
+        )
+
+        print("✅ Model saved to MLflow")
+
+        return None
 
     return None
 
@@ -79,5 +91,34 @@ def load_model(stage="Production") -> keras.Model:
         print("Model loaded from local disk")
 
         return latest_model
+
+
+
+    elif MODEL_TARGET == "mlflow":
+
+        # load model from ML Flow
+        model = None
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        client = MlflowClient()
+
+        try:
+            model_versions = client.get_latest_versions(name="skin project model", stages=[stage])
+            model_uri = model_versions[0].source
+
+            assert model_uri is not None
+
+        except:
+            print(f"\n❌ No model found with name 'skin project model' in stage {stage}")
+
+            return None
+
+        model = mlflow.tensorflow.load_model(model_uri=model_uri)
+
+        print("✅ Model loaded from MLflow")
+        return model
+    else:
+        return None
+
+
 
     return None
