@@ -7,8 +7,8 @@ import tensorflow as tf
 from tensorflow import keras
 from keras import Model, Sequential, layers, regularizers, optimizers, callbacks
 from sklearn.model_selection import train_test_split
-from model_cat import compile_model, train_model, evaluate_model, initialize_model
-from preprocess import labelize, sampler, drop_columns, categorize
+from Skin_Project.ml_logic.model_cat import compile_model, train_model, evaluate_model, initialize_model
+from Skin_Project.ml_logic.preprocess import labelize, sampler, drop_columns, categorize
 from keras.utils import to_categorical
 from Skin_Project.params import *
 
