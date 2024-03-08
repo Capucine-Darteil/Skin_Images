@@ -48,19 +48,33 @@ def load_best_model():
 
     if MODEL_TARGET == "local":
 
-        # Get the latest model version name by the timestamp on disk
-        local_model_paths = glob.glob(f"{CHEMIN_4}/best_model.h5")
+        if CLASSIFICATION == 'binary':
+            # Get the latest model version name by the timestamp on disk
+            local_best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
 
-        if not local_model_paths:
-            return None
+            if not local_best_model_path:
+                print('No best model saved yet')
+                return None
 
-        most_recent_model_path_on_disk = sorted(local_model_paths)[-1]
+            best_model = keras.models.load_model(local_best_model_path)
 
-        latest_model = keras.models.load_model(most_recent_model_path_on_disk)
+            print("Best model for binary classification loaded from local disk")
 
-        print("Model loaded from local disk")
+            return best_model
 
-        return latest_model
+        if CLASSIFICATION == 'cat':
+            # Get the latest model version name by the timestamp on disk
+            local_best_model_path = f"{CHEMIN_CAT}/best_model.h5"
+
+            if not local_best_model_path:
+                print('No best model saved yet')
+                return None
+
+            best_model = keras.models.load_model(local_best_model_path)
+
+            print("Best model for multiclass classification loaded from local disk")
+
+            return best_model
     pass
 
 
