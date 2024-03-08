@@ -1,10 +1,7 @@
 import os
 from data import get_data, merge_dicts, resize_data, flat_images, df_final, upload_df
+from Skin_Project.params import *
 
-IMAGE_SIZE = os.environ.get('IMAGE_SIZE')
-CHEMIN_1 = os.environ.get('CHEMIN_1')
-CHEMIN_2 = os.environ.get('CHEMIN_2')
-CHEMIN_METADATA = os.environ.get('CHEMIN_METADATA')
 
 def load_data(CHEMIN_1,CHEMIN_2,CHEMIN_METADATA,IMAGE_SIZE):
     dict_1 = get_data(CHEMIN_1)

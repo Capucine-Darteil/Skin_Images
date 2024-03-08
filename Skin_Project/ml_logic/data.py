@@ -4,11 +4,7 @@ from skimage import io
 from pathlib import Path
 import cv2
 import os
-
-IMAGE_SIZE = os.environ.get('IMAGE_SIZE')
-CHEMIN_1 = os.environ.get('CHEMIN_1')
-CHEMIN_2 = os.environ.get('CHEMIN_2')
-CHEMIN_METADATA = os.environ.get('CHEMIN_METADATA')
+from Skin_Project.params import *
 
 # Exemple chemin  : '/home/auguste/code/Capucine-Darteil/Skin_Images/raw_data/HAM10000_images_part_1'
 

@@ -10,11 +10,7 @@ from sklearn.model_selection import train_test_split
 from model_cat import compile_model, train_model, evaluate_model, initialize_model
 from preprocess import labelize, sampler, drop_columns, categorize
 from keras.utils import to_categorical
-IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
-CHEMIN_3 = os.environ.get('CHEMIN_3')
-CLASSIFICATION = str(os.environ.get("CLASSIFICATION"))
-SAMPLE_SIZE = float(os.environ.get('SAMPLE_SIZE',0.5))
-THRESHOLD = float(os.environ.get('THRESHOLD'))
+from Skin_Project.params import *
 
 
 def preproc(df_sample, dx):

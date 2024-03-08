@@ -10,9 +10,7 @@ from sklearn.model_selection import train_test_split
 from model import initialize_dumb_model, compile_model, train_model, evaluate_model, initialize_model
 from preprocess import labelize, sampler
 from registry import save_model, load_model, load_best_model
-IMAGE_SIZE = int(os.environ.get('IMAGE_SIZE',64))
-CHEMIN_3 = os.environ.get('CHEMIN_3')
-CHEMIN_4 = os.environ.get('CHEMIN_4')
+from Skin_Project.params import *
 
 def preproc(df_sample, dx):
     preproc = make_column_transformer(

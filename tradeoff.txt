@@ -1,2 +1,2 @@
 # Size
-Image de départ 450x600. On fait le choix de garder des proportions puissance 2 pour gagner en simplicité (64x64, 128x128, 256x256).
+Image de départ 450x600. On fait le choix de garder des proportions 128x128 car 256x256 trop lourd.
