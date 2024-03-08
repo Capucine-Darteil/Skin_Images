@@ -61,4 +61,6 @@ def custom_multiclass_predict(df_new_image):
     df_new_image = np.array(df_new_image).reshape(len(df_new_image), IMAGE_SIZE, IMAGE_SIZE, 3)
     prediction = model.predict(df_new_image)
     cat_pred = np.argmax(prediction[0])
+    multiclass_dict = {4:'Nævus mélanocytaire', 6:'Mélanome', 2:'Kératose séborrhéique', 1:'Carcinome basocellulaire', 0:'Kératose actinique', 5:'Lésion vasculaire', 3:'Dermatofibrome'}
+    multiclass_dict[cat_pred]
     return cat_pred
