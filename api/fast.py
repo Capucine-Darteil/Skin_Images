@@ -3,6 +3,9 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from Skin_Project.ml_logic.registry import load_model
 from PIL import Image
+import os
+from Skin_Project.ml_logic.data import get_data, resize_data, flat_images
+from Skin_Project.params import *
 
 app = FastAPI()
 
@@ -20,11 +23,16 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {
-    'greeting': 'Hello'
+    'Test': 'This is not a test... LOL'
 }
 
 @app.post("/image")
-def image_process(path):
+def image_process(CHEMIN_TEST,gender,age,location):
+    image = get_data(CHEMIN_TEST)
+    image_resized = resize_data(image,int(IMAGE_SIZE))
+    metadata_dict = {'Age':age,'Sex':gender, 'Localization':location}
+    image_metadata = pd.DataFrame(metadata_dict)
+    new_image_processed = flat_images()
     #récupérer chemin de la photo
     #preprocess l'image
     #model.predict image (besoin d'avoir un load model fonctionnel)
