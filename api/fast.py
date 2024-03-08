@@ -41,7 +41,7 @@ def image_process(CHEMIN_TEST,gender,age,location):
 
     return df_new_image
 
-def binary_classification_predict(df_new_image,THRESHOLD):
+def custom_binary_predict(df_new_image,THRESHOLD):
     model = load_best_model()
     threshold = THRESHOLD
     df_new_image = df_new_image.drop(columns=['Age', 'Sex', 'Localization'])
@@ -54,10 +54,11 @@ def binary_classification_predict(df_new_image,THRESHOLD):
     else:
         return 1
 
-def all_classification_predict(df_new_image):
+def custom_multiclass_predict(df_new_image):
+    model = load_best_model()
     df_new_image = df_new_image.drop(columns=['Age', 'Sex', 'Localization'])
     df_new_image = df_new_image/255
     df_new_image = np.array(df_new_image).reshape(len(df_new_image), IMAGE_SIZE, IMAGE_SIZE, 3)
     prediction = model.predict(df_new_image)
-    print(prediction)
-    return prediction
+    cat_pred = np.argmax(prediction[0])
+    return cat_pred
