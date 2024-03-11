@@ -18,4 +18,9 @@ MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
 MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
 MLFLOW_MODEL_NAME = os.environ.get("MLFLOW_MODEL_NAME")
 MLFLOW_EXPERIMENT = os.environ.get("MLFLOW_EXPERIMENT")
+
+API_URL = os.environ.get("API_URL")
+IMAGE_DIR = os.environ.get("IMAGE_DIR")
+
 METADATA=os.environ.get("METADATA")
+
