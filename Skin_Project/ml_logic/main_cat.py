@@ -12,6 +12,7 @@ from Skin_Project.ml_logic.preprocess import labelize, sampler, drop_columns, ca
 from keras.utils import to_categorical
 from Skin_Project.params import *
 from Skin_Project.ml_logic.registry import save_model, load_model, load_best_model
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 
 
 def preproc(df_sample, dx):
@@ -20,10 +21,27 @@ def preproc(df_sample, dx):
         remainder ='passthrough')
     return preproc
 
+#split dataset to send to different preprocs
+def dataset_clean_split(df):
+    df128_metadata_dropped = df.drop(columns =['lesion_id', 'dx_type'], axis=1)
+    df128_cat = df128_metadata_dropped[['age','sex','localization','dx']]
+    df128_pixels = df128_metadata_dropped.drop(columns = ['age','sex', 'localization'])
+    return df128_cat, df128_pixels
+
+#minmax scale age and ohe sex and localization
+def preproc_metadata():
+    preproc_metadata = make_column_transformer(
+        (MinMaxScaler(), ['age']),
+        (OneHotEncoder(sparse_output=False), ['sex', 'localization']),
+        remainder='passthrough')
+    return preproc_metadata
+
 
 def preprocess():
     print('coucou')
+
     df = pd.read_csv(CHEMIN_3, index_col=0)
+
 
     #df = categorize(df)
     #print('df categorized')
@@ -38,25 +56,86 @@ def preprocess():
         df = sampler(df)
         print (f'df sampled with a ratio of {df.dx.value_counts()[0]/df.shape[0]}')
 
-    preprocess = preproc(df, 'dx')
-    df_processed = pd.DataFrame(preprocess.fit_transform(df), columns = preprocess.get_feature_names_out())
 
-    X_processed = df_processed.drop(columns='remainder__dx')
-    y_processed=df_processed['remainder__dx']
-    print('data in processing...')
+    if METADATA == 'yes':
+        #categorize
+        df = categorize(df)
+        print('dataframe categorized...')
 
-    X_train, X_test, y_train, y_test = train_test_split(X_processed, y_processed, test_size=0.33, random_state=42)
-    print('data split')
+        #drop nan values
+        df = df.dropna()
+        print('NaN removed')
 
-    X_train = np.array(X_train).reshape(len(X_train), IMAGE_SIZE, IMAGE_SIZE, 3)
-    X_test = np.array(X_test).reshape(len(X_test), IMAGE_SIZE, IMAGE_SIZE, 3)
-    print('data reshaped :)')
+        #split dataset into cat and pixel datasets
+        df128_cat, df128_pixels = dataset_clean_split(df)
+        print('dataframe split...')
 
-    if CLASSIFICATION=='cat':
+        # Definition of X and y
+        X_cat = df128_cat.drop(columns='dx')
+        y_cat = df128_cat.dx
+        X_pixel = df128_pixels.drop(columns='dx')
+        y_pixel = df128_pixels.dx
+        print('dataframe DEFINETELY split...')
+
+        #ohe and minmax features on cat dataset
+        X_cat_processed = pd.DataFrame(preproc_metadata().fit_transform(X_cat))
+        print('data cat in processing...')
+
+        #standardize pixels on pixel dataset
+        X_pixel_processed = pd.DataFrame(preproc(df128_pixels,'dx').fit_transform(X_pixel))
+        print('data pixels in processing...')
+
+        #Train test split on cat dataset
+        X_train_cat, X_test_cat, y_train_cat, y_test_cat = train_test_split(X_cat_processed, y_cat, test_size=0.33, random_state=42)
+        print('cat data split')
+
+        #Train test split on pixel dataset
+        X_train_pixel, X_test_pixel, y_train_pixel, y_test_pixel = train_test_split(X_pixel_processed, y_pixel, test_size=0.33, random_state=42)
+        print('pixel data split')
+
+        #reshape pixels for CNN
+        X_train_pixel = np.array(X_train_pixel).reshape(len(X_train_pixel), IMAGE_SIZE, IMAGE_SIZE, 3)
+        X_test_pixel = np.array(X_test_pixel).reshape(len(X_test_pixel), IMAGE_SIZE, IMAGE_SIZE, 3)
+        print('data reshaped :)')
+
+        if CLASSIFICATION=='cat':
         ### Encoding the labels
-        y_train = to_categorical(y_train, 7)
-        y_test = to_categorical(y_test, 7)
-        print('')
+            y_train_pixel = to_categorical(y_train_pixel, 7)
+            y_test_pixel = to_categorical(y_test_pixel, 7)
+            print('target pixel categorized')
+        print(X_train_pixel.shape)
+        print(X_test_pixel.shape)
+        print(X_train_cat.shape)
+        print(X_test_cat.shape)
+        print(y_train_pixel.shape)
+        print(y_test_pixel.shape)
+        print(y_train_cat.shape)
+        print(y_test_cat.shape)
+        print(X_train_cat)
+
+
+        return X_train_pixel, X_test_pixel, X_train_cat, X_test_cat, y_train_pixel, y_test_pixel, y_train_cat, y_test_cat
+
+    if METADATA == 'no':
+        preprocess = preproc(df, 'dx')
+        df_processed = pd.DataFrame(preprocess.fit_transform(df), columns = preprocess.get_feature_names_out())
+
+        X_processed = df_processed.drop(columns='remainder__dx')
+        y_processed=df_processed['remainder__dx']
+        print('data in processing...')
+
+        X_train, X_test, y_train, y_test = train_test_split(X_processed, y_processed, test_size=0.33, random_state=42)
+        print('data split')
+
+        X_train = np.array(X_train).reshape(len(X_train), IMAGE_SIZE, IMAGE_SIZE, 3)
+        X_test = np.array(X_test).reshape(len(X_test), IMAGE_SIZE, IMAGE_SIZE, 3)
+        print('data reshaped :)')
+
+        if CLASSIFICATION=='cat':
+            ### Encoding the labels
+            y_train = to_categorical(y_train, 7)
+            y_test = to_categorical(y_test, 7)
+            print('')
 
     return X_train, X_test, y_train, y_test
 
@@ -67,6 +146,8 @@ def train():
     print(X_train.shape)
     print(y_train.shape)
     print(y_train)
+    print(X_test)
+    print(X_test.shape)
 
     model = initialize_model()
     print('model initialized...')
@@ -77,7 +158,7 @@ def train():
     model, history = train_model(model, X_train,y_train)
     print('model trained!')
 
-    if CLASSIFICATION == 'local':
+    if MODEL_TARGET == 'local':
         #Load the best model
         best_model = load_best_model()
 
@@ -93,25 +174,25 @@ def train():
                 print("First model is saved as best model !")
                 pass
 
-        best_metrics = evaluate_model(best_model, X_test, y_test,threshold=THRESHOLD)
-        print(f'ancient metrics are : {best_metrics}')
+        #best_metrics = evaluate_model(best_model, X_test, y_test,threshold=THRESHOLD)
+        #print(f'ancient metrics are : {best_metrics}')
 
         metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
         print(f'new metrics are : {metrics}')
 
         keys_ =list(metrics.keys())
 
-        if metrics[keys_[2]]>best_metrics['Recall'] and metrics[keys_[1]]>0.5:
-            if CLASSIFICATION == 'binary':
-                best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
-                model.save(best_model_path)
-                print("New best model (binary) !")
-                return metrics
-            if CLASSIFICATION == 'cat':
-                best_model_path = f"{CHEMIN_CAT}/best_model.h5"
-                model.save(best_model_path)
-                print("New best model (multiclass) !")
-                return metrics
+        #if metrics[keys_[2]]>best_metrics['Recall'] and metrics[keys_[1]]>0.5:
+        if CLASSIFICATION == 'binary':
+            best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
+            model.save(best_model_path)
+            print("New best model (binary) !")
+            return metrics
+        if CLASSIFICATION == 'cat':
+            best_model_path = f"{CHEMIN_CAT}/best_model.h5"
+            model.save(best_model_path)
+            print("New best model (multiclass) !")
+            return metrics
 
         else :
             print('The new model is not better than the best model, try again ! :(')
@@ -120,4 +201,5 @@ def train():
 
 
 if __name__ == '__main__':
+    #preprocess()
     train()
