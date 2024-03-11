@@ -8,6 +8,11 @@ import os
 from Skin_Project.ml_logic.data import get_data, resize_data, flat_images
 from Skin_Project.params import *
 from Skin_Project.ml_logic.registry import load_best_model
+from starlette.responses import Response
+from fastapi.responses import FileResponse
+import cv2
+from typing import Union
+import uuid
 
 app = FastAPI()
 
@@ -28,6 +33,35 @@ def root():
     'Test': 'This is not a test... LOL'
 }
 
+@app.post('/upload_image')
+async def create_upload_image(img: UploadFile=File(...)):
+
+    contents = await img.read()
+    image = np.fromstring(contents, np.uint8)
+    image=cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+
+    model = load_best_model()
+
+    image_resized = cv2.resize(image, (64,64))
+
+    threshold = THRESHOLD
+
+    df_new_image =image_resized/255
+    df_new_image = np.array(df_new_image).reshape(1, IMAGE_SIZE, IMAGE_SIZE, 3)
+    prediction = model.predict(df_new_image)
+
+    if prediction[0][0] < float(threshold) :
+        result=('Not dangerous')
+    else:
+        result=('Yuck! You better go check that')
+
+    return Response(content=result)
+
+
+
+
+'''
 @app.post("/image")
 def image_process(CHEMIN_TEST,gender,age,location):
     image = get_data(CHEMIN_TEST)
@@ -64,3 +98,4 @@ def custom_multiclass_predict(df_new_image):
     multiclass_dict = {4:'Nævus mélanocytaire', 6:'Mélanome', 2:'Kératose séborrhéique', 1:'Carcinome basocellulaire', 0:'Kératose actinique', 5:'Lésion vasculaire', 3:'Dermatofibrome'}
     multiclass_dict[cat_pred]
     return cat_pred
+'''
