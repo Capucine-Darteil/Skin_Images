@@ -7,7 +7,7 @@ import tensorflow as tf
 from tensorflow import keras
 from keras import Model, Sequential, layers, regularizers, optimizers, callbacks
 from sklearn.model_selection import train_test_split
-from Skin_Project.ml_logic.model_cat import compile_model, train_model, evaluate_model, initialize_model
+from Skin_Project.ml_logic.model_cat import compile_model, train_model, evaluate_model, initialize_model, initialize_fit_model_ml
 from Skin_Project.ml_logic.preprocess import labelize, sampler, drop_columns, categorize
 from keras.utils import to_categorical
 from Skin_Project.params import *
@@ -131,101 +131,210 @@ def preprocess():
 
 
 def train():
-    X_train, X_test, y_train, y_test = preprocess()
+    if METADATA == 'no':
+        X_train, X_test, y_train, y_test = preprocess()
 
-    print(X_train.shape)
-    print(y_train.shape)
-    print(y_train)
-    print(X_test)
-    print(X_test.shape)
+        model = initialize_model()
+        print('model initialized...')
 
-    model = initialize_model()
-    print('model initialized...')
+        model = compile_model(model)
+        print('model compiled')
 
-    model = compile_model(model)
-    print('model compiled')
+        model, history = train_model(model, X_train,y_train)
+        print('model trained!')
 
-    model, history = train_model(model, X_train,y_train)
-    print('model trained!')
 
-    if MODEL_TARGET == 'local':
-        #Load the best model
-        best_model = load_best_model()
+        if MODEL_TARGET == 'local':
+            #Load the best model
+            best_model = load_best_model()
 
-        if best_model == None:
+            if best_model == None:
+                if CLASSIFICATION == 'binary':
+                    best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
+                    model.save(best_model_path)
+                    print("First model is saved as best model !")
+                    pass
+                if CLASSIFICATION == 'cat':
+                    best_model_path = f"{CHEMIN_CAT}/best_model.h5"
+                    model.save(best_model_path)
+                    print("First model is saved as best model !")
+                    pass
+
+            #best_metrics = evaluate_model(best_model, X_test, y_test,threshold=THRESHOLD)
+            #print(f'ancient metrics are : {best_metrics}')
+
+            metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
+            print(f'new metrics are : {metrics}')
+
+            keys_ =list(metrics.keys())
+
+            #if metrics[keys_[2]]>best_metrics['Recall'] and metrics[keys_[1]]>0.5:
             if CLASSIFICATION == 'binary':
                 best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
                 model.save(best_model_path)
-                print("First model is saved as best model !")
-                pass
-            if CLASSIFICATION == 'cat':
-                best_model_path = f"{CHEMIN_CAT}/best_model.h5"
-                model.save(best_model_path)
-                print("First model is saved as best model !")
-                pass
-
-        #best_metrics = evaluate_model(best_model, X_test, y_test,threshold=THRESHOLD)
-        #print(f'ancient metrics are : {best_metrics}')
-
-        metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
-        print(f'new metrics are : {metrics}')
-
-        keys_ =list(metrics.keys())
-
-        #if metrics[keys_[2]]>best_metrics['Recall'] and metrics[keys_[1]]>0.5:
-        if CLASSIFICATION == 'binary':
-            best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
-            model.save(best_model_path)
-            print("New best model (binary) !")
-            return metrics
-        if CLASSIFICATION == 'cat':
-            best_model_path = f"{CHEMIN_CAT}/best_model.h5"
-            model.save(best_model_path)
-            print("New best model (multiclass) !")
-            return metrics
-
-        #else :
-        #    print('The new model is not better than the best model, try again ! :(')
-        #    return best_metrics
-
-    elif MODEL_TARGET == 'mlflow':
-        best_model = load_model()
-        if best_model == None:
-            if CLASSIFICATION == 'binary':
-                save_model(model)
-                mlflow_transition_model('None', 'Production')
-                print("First model is saved as best model !")
-                pass
-            if CLASSIFICATION == 'cat':
-                save_model(model)
-                mlflow_transition_model('None', 'Production')
-                print("First model is saved as best model !")
-                pass
-
-        metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
-        print(f'new metrics are : {metrics}')
-
-        best_metrics = evaluate_model(best_model, X_test, y_test,threshold=THRESHOLD)
-        print(f'ancient metrics are : {best_metrics}')
-
-        keys_ =list(metrics.keys())
-
-        if metrics[keys_[2]]>best_metrics['Recall'] and metrics[keys_[1]]>0.5:
-            if CLASSIFICATION == 'binary':
-                save_model(model)
-                mlflow_transition_model('None', 'Production')
                 print("New best model (binary) !")
                 return metrics
             if CLASSIFICATION == 'cat':
-                save_model(model)
-                mlflow_transition_model('None', 'Production')
+                best_model_path = f"{CHEMIN_CAT}/best_model.h5"
+                model.save(best_model_path)
                 print("New best model (multiclass) !")
                 return metrics
 
-        else:
-            print("Your model is less efficient than the last one :(")
+            #else :
+            #    print('The new model is not better than the best model, try again ! :(')
+            #    return best_metrics
 
-    pass
+        elif MODEL_TARGET == 'mlflow':
+            best_model = load_model()
+            if best_model == None:
+                if CLASSIFICATION == 'binary':
+                    save_model(model)
+                    mlflow_transition_model('None', 'Production')
+                    print("First model is saved as best model !")
+                    pass
+                if CLASSIFICATION == 'cat':
+                    save_model(model)
+                    mlflow_transition_model('None', 'Production')
+                    print("First model is saved as best model !")
+                    pass
+
+            metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
+            print(f'new metrics are : {metrics}')
+
+            best_metrics = evaluate_model(best_model, X_test, y_test,threshold=THRESHOLD)
+            print(f'ancient metrics are : {best_metrics}')
+
+            keys_ =list(metrics.keys())
+
+            if metrics[keys_[2]]>best_metrics['Recall'] and metrics[keys_[1]]>0.5:
+                if CLASSIFICATION == 'binary':
+                    save_model(model)
+                    mlflow_transition_model('None', 'Production')
+                    print("New best model (binary) !")
+                    return metrics
+                if CLASSIFICATION == 'cat':
+                    save_model(model)
+                    mlflow_transition_model('None', 'Production')
+                    print("New best model (multiclass) !")
+                    return metrics
+
+            else:
+                print("Your model is less efficient than the last one :(")
+
+        pass
+
+    elif METADATA == 'yes':
+        X_train_pixel, X_test_pixel, X_train_cat, X_test_cat, y_train_pixel, y_test_pixel, y_train_cat, y_test_cat = preprocess()
+
+        model = initialize_model()
+        print('model cnn initialized...')
+
+        model = compile_model(model)
+        print('model cnn compiled')
+
+        model, history = train_model(model, X_train_pixel,y_train_pixel)
+        print('model cnn trained!')
+
+        model_ml = initialize_fit_model_ml(X_train_cat,y_train_cat)
+        print('model ml trained !')
+
+        if MODEL_TARGET == 'local':
+            #Load the best model
+            best_model, best_model_ml = load_best_model()
+            if best_model == None:
+                if CLASSIFICATION == 'binary':
+                    best_model_path = f"{CHEMIN_META_BINARY}/best_model.h5"
+                    model.save(best_model_path)
+                    print("First model cnn is saved as best model !")
+
+                    best_model_ml_path = f"{CHEMIN_META_BINARY}/best_model_ml.h5"
+                    model.save(best_model_ml_path)
+                    print("First model ml is saved as best model !")
+                    pass
+                if CLASSIFICATION == 'cat':
+                    best_model_path = f"{CHEMIN_META_CAT}/best_model.h5"
+                    model.save(best_model_path)
+                    print("First model cnn is saved as best model !")
+
+                    best_model_ml_path = f"{CHEMIN_META_CAT}/best_model_ml.h5"
+                    model.save(best_model_ml_path)
+                    print("First model ml is saved as best model !")
+                    pass
+
+            best_accuracy, best_recall = evaluate_model(best_model,X_test_pixel,y_test_pixel,threshold=THRESHOLD, batch_size=256,
+                                          model_ml=best_model_ml, X_test_cat=X_test_cat,
+                                          X_test_pixel=X_test_pixel, weight_cnn=0.9)
+            print(f'ancient metrics are : {best_accuracy, best_recall}')
+
+            accuracy, recall = evaluate_model(model,X_test_pixel,y_test_pixel,threshold=THRESHOLD, batch_size=256,
+                                          model_ml=model_ml, X_test_cat=X_test_cat,
+                                          X_test_pixel=X_test_pixel, weight_cnn=0.9)
+            print(f'new metrics are : {accuracy, recall}')
+
+            if best_recall>recall and accuracy>0.5:
+                if CLASSIFICATION == 'binary':
+                    best_model_path = f"{CHEMIN_META_BINARY}/best_model.h5"
+                    model.save(best_model_path)
+                    print("New best model cnn (binary) !")
+
+                    best_model_ml_path = f"{CHEMIN_META_BINARY}/best_model_ml.h5"
+                    model.save(best_model_ml_path)
+                    print("First model ml is saved as best model !")
+
+                    return accuracy, recall
+
+                if CLASSIFICATION == 'cat':
+                    best_model_path = f"{CHEMIN_META_CAT}/best_model.h5"
+                    model.save(best_model_path)
+                    print("New best model cnn (multiclass) !")
+
+                    best_model_ml_path = f"{CHEMIN_META_CAT}/best_model_ml.h5"
+                    model.save(best_model_ml_path)
+                    print("First model ml is saved as best model !")
+                    return accuracy, recall
+
+            else :
+                print('The new model is not better than the best model, try again ! :(')
+                return best_accuracy, best_recall
+
+        elif MODEL_TARGET == 'mlflow':
+            best_model = load_model()
+            if best_model == None:
+                if CLASSIFICATION == 'binary':
+                    save_model(model)
+                    mlflow_transition_model('None', 'Production')
+                    print("First model is saved as best model !")
+                    pass
+                if CLASSIFICATION == 'cat':
+                    save_model(model)
+                    mlflow_transition_model('None', 'Production')
+                    print("First model is saved as best model !")
+                    pass
+
+            metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
+            print(f'new metrics are : {metrics}')
+
+            best_metrics = evaluate_model(best_model, X_test, y_test,threshold=THRESHOLD)
+            print(f'ancient metrics are : {best_metrics}')
+
+            keys_ =list(metrics.keys())
+
+            if metrics[keys_[2]]>best_metrics['Recall'] and metrics[keys_[1]]>0.5:
+                if CLASSIFICATION == 'binary':
+                    save_model(model)
+                    mlflow_transition_model('None', 'Production')
+                    print("New best model (binary) !")
+                    return metrics
+                if CLASSIFICATION == 'cat':
+                    save_model(model)
+                    mlflow_transition_model('None', 'Production')
+                    print("New best model (multiclass) !")
+                    return metrics
+
+            else:
+                print("Your model is less efficient than the last one :(")
+
+        pass
 
 
 if __name__ == '__main__':
