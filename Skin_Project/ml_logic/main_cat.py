@@ -11,7 +11,7 @@ from Skin_Project.ml_logic.model_cat import compile_model, train_model, evaluate
 from Skin_Project.ml_logic.preprocess import labelize, sampler, drop_columns, categorize
 from keras.utils import to_categorical
 from Skin_Project.params import *
-from Skin_Project.ml_logic.registry import save_model, load_model, load_best_model
+from Skin_Project.ml_logic.registry import save_model, load_model, load_best_model, mlflow_transition_model
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 
 
@@ -184,9 +184,47 @@ def train():
             print("New best model (multiclass) !")
             return metrics
 
-        else :
-            print('The new model is not better than the best model, try again ! :(')
-            return best_metrics
+        #else :
+        #    print('The new model is not better than the best model, try again ! :(')
+        #    return best_metrics
+
+    elif MODEL_TARGET == 'mlflow':
+        best_model = load_model()
+        if best_model == None:
+            if CLASSIFICATION == 'binary':
+                save_model(model)
+                mlflow_transition_model('None', 'Production')
+                print("First model is saved as best model !")
+                pass
+            if CLASSIFICATION == 'cat':
+                save_model(model)
+                mlflow_transition_model('None', 'Production')
+                print("First model is saved as best model !")
+                pass
+
+        metrics = evaluate_model(model, X_test, y_test,threshold=THRESHOLD)
+        print(f'new metrics are : {metrics}')
+
+        best_metrics = evaluate_model(best_model, X_test, y_test,threshold=THRESHOLD)
+        print(f'ancient metrics are : {best_metrics}')
+
+        keys_ =list(metrics.keys())
+
+        if metrics[keys_[2]]>best_metrics['Recall'] and metrics[keys_[1]]>0.5:
+            if CLASSIFICATION == 'binary':
+                save_model(model)
+                mlflow_transition_model('None', 'Production')
+                print("New best model (binary) !")
+                return metrics
+            if CLASSIFICATION == 'cat':
+                save_model(model)
+                mlflow_transition_model('None', 'Production')
+                print("New best model (multiclass) !")
+                return metrics
+
+        else:
+            print("Your model is less efficient than the last one :(")
+
     pass
 
 

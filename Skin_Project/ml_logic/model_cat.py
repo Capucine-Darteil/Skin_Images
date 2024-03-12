@@ -11,56 +11,35 @@ def initialize_model():
     model = Sequential()
 
     if CLASSIFICATION == 'cat':
-
-     # First convolutional layer
-        model.add(layers.Conv2D(filters = 256, kernel_size = (5,5), padding = "same", activation = "relu", input_shape = (IMAGE_SIZE,IMAGE_SIZE,3)))
-
-     # Max pooling layer and BatchNormalization layer
-        model.add(layers.MaxPool2D(pool_size = (2,2)))
-        #model.add(layers.BatchNormalization())
-
-     # Second convolutional layer
-        model.add(layers.Conv2D(filters = 128,
-                kernel_size = (3,3),
-                padding = "same",
-                activation = "relu"))
-
-     # Max pooling layer and BatchNormalization layer
-        model.add(layers.MaxPool2D(pool_size = (2,2)))
-        #model.add(layers.BatchNormalization())
-
-        # Third convolutional layer
-        model.add(layers.Conv2D(filters = 64,
-                kernel_size = (3,3),
-                padding = "same",
-                activation = "relu"))
-
-     # Max pooling layer and BatchNormalization layer
-        model.add(layers.MaxPool2D(pool_size = (2,2)))
-        #model.add(layers.BatchNormalization())
-
-        # Fourth convolutional layer
-        #model.add(layers.Conv2D(filters = 256,
-        #           kernel_size = (3,3),
-        #           padding = "same",
-        #           activation = "relu"))
-
-     # Max pooling layer and BatchNormalization layer
-        #model.add(layers.MaxPool2D(pool_size = (2,2)))
-        #model.add(layers.BatchNormalization())
-
-        # Flattening layer
+        model = Sequential()
+        model.add(layers.Conv2D(filters=96, kernel_size=(11, 11),
+                            strides=(4, 4), activation="relu",
+                            input_shape=(128, 128, 3)))
+        model.add(layers.BatchNormalization())
+        model.add(layers.MaxPool2D(pool_size=(3, 3), strides= (2, 2)))
+        model.add(layers.Conv2D(filters=256, kernel_size=(5, 5),
+                            strides=(1, 1), activation="relu",
+                            padding="same"))
+        model.add(layers.BatchNormalization())
+        model.add(layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2)))
+        model.add(layers.Conv2D(filters=384, kernel_size=(3, 3),
+                            strides=(1, 1), activation="relu",
+                            padding="same"))
+        model.add(layers.BatchNormalization())
+        model.add(layers.Conv2D(filters=384, kernel_size=(3, 3),
+                            strides=(1, 1), activation="relu",
+                            padding="same"))
+        model.add(layers.BatchNormalization())
+        model.add(layers.Conv2D(filters=256, kernel_size=(3, 3),
+                            strides=(1, 1), activation="relu",
+                            padding="same"))
+        model.add(layers.BatchNormalization())
+        model.add(layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2)))
         model.add(layers.Flatten())
-
-        # Dense layer
-        model.add(layers.Dense(units = 256,
-                    activation = "relu"))
-
+        model.add(layers.Dense(4096, activation="relu"))
         model.add(layers.Dropout(0.5))
 
-        # Output layer
-        model.add(layers.Dense(7, activation='softmax'))
-
+        model.add(layers.Dense(7, activation="softmax"))
         return model
 
     if CLASSIFICATION == 'binary':
