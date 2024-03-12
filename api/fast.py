@@ -13,11 +13,12 @@ import cv2
 import tensorflow as tf
 from pydantic import BaseModel
 import pickle
+import json
 
-class Item(BaseModel):
-    sex: str
-    age: int
-    localization: str
+# class Item(BaseModel):
+#     sex: str
+#     age: int
+#     localization: str
 
 app = FastAPI()
 
@@ -85,41 +86,42 @@ async def custom_multiclass_predict(img: UploadFile=File(...)):
 
     return Response(content=mole_type)
 
-data1 = {
-    "sex":"male",
-    "age":20,
-    "localization":"neck"
-}
+# data1 = {
+#     "sex":"male",
+#     "age":20,
+#     "localization":"neck"
+# }
 
 
 @app.post('/predict_metadata')
-async def custom_predict_metadata(data=data1,img: UploadFile=File(...)):
+async def custom_predict_metadata(data,img: UploadFile=File(...)):
     print('test')
 
-    with open('preproc.pkl', 'rb') as file:
+    with open('/home/pavel/code/Capucine-Darteil/Skin_Images/api/preproc.pkl', 'rb') as file:
         load_preproc = pickle.load(file)
 
-    # contents = await img.read()
-    # image = np.fromstring(contents, np.uint8)
-    # image=cv2.imdecode(image, cv2.IMREAD_COLOR)
+    contents = await img.read()
+    image = np.fromstring(contents, np.uint8)
+    image=cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-    # age = item.age
-    # sex = item.sex
-    # localization = item.localization
+    data = json.loads(data)
+
+    age = data['age']
+    sex = data['sex']
+    localization = data['localization']
 
     # # Create the dict
-    # data = {
-    #     'age': [age],
-    #     'sex': [sex.lower()],
-    #     'localization': [localization.lower()]
-    # }
+    X_dict = {
+        'age': age,
+        'sex': sex.lower(),
+        'localization': localization.lower()
+    }
 
-    # # Create the pandas DataFrame
-    # df_X = pd.DataFrame(data)
-    # new_x = load_preproc.transform(df_X)
+    # Create the pandas DataFrame
+    df_X = pd.DataFrame(X_dict,index=[0])
+    new_x = load_preproc.transform(df_X)
 
-    # return Response(new_x)
-    return "hello"
+    return new_x[0][0]
 
 '''
 @app.post("/image")
