@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/1fa4c29987fe4a7ba00fe83f8bbc3c20/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 1fa4c29987fe4a7ba00fe83f8bbc3c20
+run_name: agreeable-chimp-347
+run_uuid: 1fa4c29987fe4a7ba00fe83f8bbc3c20
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1710233502180
+status: 1
+tags: []
+user_id: auguste

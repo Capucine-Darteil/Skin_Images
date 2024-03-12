@@ -14,17 +14,17 @@ def save_model(model: keras.Model = None) -> None:
     - if MODEL_TARGET='mlflow', also persist it on MLflow instead of GCS (for unit 0703 only) --> unit 03 only
     """
 
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    # timestamp = time.strftime("%Y%m%d-%H%M%S")
 
-    # Save model locally
-    model_path = os.path.join(CHEMIN_4, f"{timestamp}.h5")
-    model.save(model_path)
-    print("Model saved locally")
+    # # Save model locally
+    # model_path = os.path.join(CHEMIN_4, f"{timestamp}.h5")
+    # model.save(model_path)
+    # print("Model saved locally")
 
     if MODEL_TARGET == "mlflow":
         mlflow.tensorflow.log_model(
             model=model,
-            artifact_path="model",
+            artifact_path="tmp/mlartifacts",
             registered_model_name="skin project model"
         )
 
@@ -132,7 +132,3 @@ def load_model(stage="Production") -> keras.Model:
         return model
     else:
         return None
-
-
-
-    return None

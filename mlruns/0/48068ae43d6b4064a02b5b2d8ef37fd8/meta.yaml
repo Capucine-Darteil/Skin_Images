@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/48068ae43d6b4064a02b5b2d8ef37fd8/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 48068ae43d6b4064a02b5b2d8ef37fd8
+run_name: thoughtful-dove-870
+run_uuid: 48068ae43d6b4064a02b5b2d8ef37fd8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1710233710064
+status: 1
+tags: []
+user_id: auguste
