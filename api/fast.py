@@ -9,10 +9,16 @@ from Skin_Project.ml_logic.data import get_data, resize_data, flat_images
 from Skin_Project.params import *
 from Skin_Project.ml_logic.registry import load_best_model
 from starlette.responses import Response
-from fastapi.responses import FileResponse
 import cv2
-from typing import Union
-import uuid
+import tensorflow as tf
+from pydantic import BaseModel
+import pickle
+import json
+
+# class Item(BaseModel):
+#     sex: str
+#     age: int
+#     localization: str
 
 app = FastAPI()
 
@@ -33,15 +39,15 @@ def root():
     'Test': 'This is not a test... LOL'
 }
 
-@app.post('/upload_image')
-async def create_upload_image(img: UploadFile=File(...)):
+@app.post('/binary_classification')
+async def custom_binary_classification(img: UploadFile=File(...)):
 
     contents = await img.read()
     image = np.fromstring(contents, np.uint8)
     image=cv2.imdecode(image, cv2.IMREAD_COLOR)
 
 
-    model = load_best_model()
+    binary_model = load_best_model()
 
     image_resized = cv2.resize(image, (64,64))
 
@@ -49,7 +55,7 @@ async def create_upload_image(img: UploadFile=File(...)):
 
     df_new_image =image_resized/255
     df_new_image = np.array(df_new_image).reshape(1, IMAGE_SIZE, IMAGE_SIZE, 3)
-    prediction = model.predict(df_new_image)
+    prediction = binary_model.predict(df_new_image)
 
     if prediction[0][0] < float(threshold) :
         result=('Not dangerous')
@@ -58,8 +64,64 @@ async def create_upload_image(img: UploadFile=File(...)):
 
     return Response(content=result)
 
+@app.post('/multiclass_classification')
+async def custom_multiclass_predict(img: UploadFile=File(...)):
+
+    contents = await img.read()
+    image = np.fromstring(contents, np.uint8)
+    image=cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+    local_best_model_path = f"{CHEMIN_CAT}/best_model.h5"
+    multiclass_model = tf.keras.models.load_model(local_best_model_path)
+
+    multi_image_resized = cv2.resize(image, (128,128))
+
+    multi_new_image =multi_image_resized/255
+    multi_new_image = np.array(multi_new_image).reshape(1, 128,128, 3)
+    multi_prediction = multiclass_model.predict(multi_new_image)
+    cat_pred = np.argmax(multi_prediction[0])
+
+    multiclass_dict = {4:'Nævus mélanocytaire', 6:'Mélanome', 2:'Kératose séborrhéique', 1:'Carcinome basocellulaire', 0:'Kératose actinique', 5:'Lésion vasculaire', 3:'Dermatofibrome'}
+    mole_type = multiclass_dict[cat_pred]
+
+    return Response(content=mole_type)
+
+# data1 = {
+#     "sex":"male",
+#     "age":20,
+#     "localization":"neck"
+# }
 
 
+@app.post('/predict_metadata')
+async def custom_predict_metadata(data,img: UploadFile=File(...)):
+    print('test')
+
+    with open('/home/pavel/code/Capucine-Darteil/Skin_Images/api/preproc.pkl', 'rb') as file:
+        load_preproc = pickle.load(file)
+
+    contents = await img.read()
+    image = np.fromstring(contents, np.uint8)
+    image=cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+    data = json.loads(data)
+
+    age = data['age']
+    sex = data['sex']
+    localization = data['localization']
+
+    # # Create the dict
+    X_dict = {
+        'age': age,
+        'sex': sex.lower(),
+        'localization': localization.lower()
+    }
+
+    # Create the pandas DataFrame
+    df_X = pd.DataFrame(X_dict,index=[0])
+    new_x = load_preproc.transform(df_X)
+
+    return new_x[0][0]
 
 '''
 @app.post("/image")
