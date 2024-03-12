@@ -215,7 +215,7 @@ def evaluate_model(model,X_test,y_test,threshold, batch_size=256,
 
             return metrics
     elif METADATA == 'yes':
-        return avg_recall_accuracy(model, model_ml, X_test_cat, X_test_pixel, y_test, weight_cnn=0.5)
+        return avg_recall_accuracy(model, model_ml, X_test_cat, X_test_pixel, y_test, weight_cnn=weight_cnn)
 
     else :
         print('Metadata?')
