@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1710233716681
+current_stage: None
+description: ''
+last_updated_timestamp: 1710233716681
+name: skin project model
+run_id: 48068ae43d6b4064a02b5b2d8ef37fd8
+run_link: ''
+source: mlflow-artifacts:/0/48068ae43d6b4064a02b5b2d8ef37fd8/artifacts/mlflow/model/artifacts
+status: READY
+status_message: null
+storage_location: mlflow-artifacts:/0/48068ae43d6b4064a02b5b2d8ef37fd8/artifacts/mlflow/model/artifacts
+user_id: null
+version: 1

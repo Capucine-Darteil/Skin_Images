@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/ed1b2af6948a48a7a423ffd15f0eee78/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: ed1b2af6948a48a7a423ffd15f0eee78
+run_name: exultant-mouse-398
+run_uuid: ed1b2af6948a48a7a423ffd15f0eee78
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1710232530930
+status: 1
+tags: []
+user_id: auguste
