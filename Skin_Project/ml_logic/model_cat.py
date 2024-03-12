@@ -6,6 +6,7 @@ import os
 import pandas as pd
 from Skin_Project.params import *
 from keras.utils import to_categorical
+from sklearn.ensemble import AdaBoostClassifier
 
 def initialize_model():
     model = Sequential()
@@ -143,6 +144,10 @@ def train_model(
     return model, history
 
 
+def initialize_fit_model_ml(X_train_cat,y_train_cat):
+    model_ml = AdaBoostClassifier()
+    model_ml.fit(X_train_cat,y_train_cat)
+    return model_ml
 
 def avg_recall_accuracy(model_cnn, model_ml, X_test_cat, X_test_pixel, y_test, weight_cnn=0.5):
     y_pred_list=[]
@@ -194,7 +199,7 @@ def evaluate_model(model,X_test,y_test,threshold, batch_size=256,
 
             return metrics
     elif METADATA == 'yes':
-        return avg_recall_accuracy(model, model_ml, X_test_cat, X_test_pixel, y_test, weight_cnn=0.5)
+        return avg_recall_accuracy(model, model_ml, X_test_cat, X_test_pixel, y_test, weight_cnn=weight_cnn)
 
     else :
         print('Metadata?')
