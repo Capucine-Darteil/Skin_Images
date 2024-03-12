@@ -103,16 +103,6 @@ def preprocess():
             y_train_pixel = to_categorical(y_train_pixel, 7)
             y_test_pixel = to_categorical(y_test_pixel, 7)
             print('target pixel categorized')
-        print(X_train_pixel.shape)
-        print(X_test_pixel.shape)
-        print(X_train_cat.shape)
-        print(X_test_cat.shape)
-        print(y_train_pixel.shape)
-        print(y_test_pixel.shape)
-        print(y_train_cat.shape)
-        print(y_test_cat.shape)
-        print(X_train_cat)
-
 
         return X_train_pixel, X_test_pixel, X_train_cat, X_test_cat, y_train_pixel, y_test_pixel, y_train_cat, y_test_cat
 
