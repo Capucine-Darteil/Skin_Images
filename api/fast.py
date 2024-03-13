@@ -93,35 +93,35 @@ async def custom_multiclass_predict(img: UploadFile=File(...)):
 # }
 
 
-@app.post('/predict_metadata')
-async def custom_predict_metadata(data,img: UploadFile=File(...)):
-    print('test')
+# @app.post('/predict_metadata')
+# async def custom_predict_metadata(data,img: UploadFile=File(...)):
+#     print('test')
 
-    with open('/home/pavel/code/Capucine-Darteil/Skin_Images/api/preproc.pkl', 'rb') as file:
-        load_preproc = pickle.load(file)
+#     with open('/home/pavel/code/Capucine-Darteil/Skin_Images/api/preproc.pkl', 'rb') as file:
+#         load_preproc = pickle.load(file)
 
-    contents = await img.read()
-    image = np.fromstring(contents, np.uint8)
-    image=cv2.imdecode(image, cv2.IMREAD_COLOR)
+#     contents = await img.read()
+#     image = np.fromstring(contents, np.uint8)
+#     image=cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-    data = json.loads(data)
+#     data = json.loads(data)
 
-    age = data['age']
-    sex = data['sex']
-    localization = data['localization']
+#     age = data['age']
+#     sex = data['sex']
+#     localization = data['localization']
 
-    # # Create the dict
-    X_dict = {
-        'age': age,
-        'sex': sex.lower(),
-        'localization': localization.lower()
-    }
+#     # # Create the dict
+#     X_dict = {
+#         'age': age,
+#         'sex': sex.lower(),
+#         'localization': localization.lower()
+#     }
 
-    # Create the pandas DataFrame
-    df_X = pd.DataFrame(X_dict,index=[0])
-    new_x = load_preproc.transform(df_X)
+#     # Create the pandas DataFrame
+#     df_X = pd.DataFrame(X_dict,index=[0])
+#     new_x = load_preproc.transform(df_X)
 
-    return new_x[0][0]
+#     return new_x[0][0]
 
 '''
 @app.post("/image")
