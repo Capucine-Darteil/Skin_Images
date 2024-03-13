@@ -69,7 +69,7 @@ def load_best_model():
                     print('No best model saved yet')
                     return None
 
-                best_model = load_model(local_best_model_path)
+                best_model = keras.saving.load_model(local_best_model_path)
 
                 print("Best model for binary classification loaded from local disk")
 
@@ -83,7 +83,7 @@ def load_best_model():
                     print('No best model saved yet')
                     return None
 
-                best_model = load_model(local_best_model_path)
+                best_model = keras.saving.load_model(local_best_model_path)
 
                 print("Best model for multiclass classification loaded from local disk")
 
@@ -101,12 +101,12 @@ def load_best_model():
                     print('No best model saved yet')
                     return None, None
 
-                best_model = load_model(local_best_model_path)
+                best_model = keras.saving.load_model(local_best_model_path)
 
                 print("Best model cnn for binary classification loaded from local disk")
 
                 local_best_model_ml_path = f"{CHEMIN_META_BINARY}/best_model_ml.h5"
-                best_model_ml = load_model(local_best_model_ml_path)
+                best_model_ml = keras.saving.load_model(local_best_model_ml_path)
 
                 print("Best model ml for binary classification loaded from local disk")
 
@@ -120,12 +120,12 @@ def load_best_model():
                     print('No best model saved yet')
                     return None, None
 
-                best_model = load_model(local_best_model_path)
+                best_model = keras.saving.load_model(local_best_model_path)
 
                 print("Best model for multiclass classification loaded from local disk")
 
                 local_best_model_ml_path = f"{CHEMIN_META_CAT}/best_model_ml.h5"
-                best_model_ml = load_model(local_best_model_ml_path)
+                best_model_ml = keras.saving.load_model(local_best_model_ml_path)
 
                 print("Best model ml for multiclass classification loaded from local disk")
 
@@ -154,7 +154,7 @@ def load_model(stage="Production") -> keras.Model:
         most_recent_model_path_on_disk = sorted(local_model_paths)[-1]
         print('local_model_paths',local_model_paths)
 
-        latest_model = load_model(most_recent_model_path_on_disk)
+        latest_model = keras.saving.load_model(most_recent_model_path_on_disk)
 
         print("Model loaded from local disk")
 
