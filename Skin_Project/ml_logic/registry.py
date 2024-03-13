@@ -23,14 +23,26 @@ def save_model(model: keras.Model = None) -> None:
     print("Model saved locally")
 
     if MODEL_TARGET == "mlflow":
-        mlflow.tensorflow.log_model(
-            model=model,
-            artifact_path="tmp/mlartifacts",
-            registered_model_name="skin project binary model"
-        )
+        if CLASSIFICATION=="binary":
+            mlflow.tensorflow.log_model(
+                model=model,
+                artifact_path="tmp/mlartifacts",
+                registered_model_name="skin project binary model"
+            )
 
-        print("✅ Binary model saved to MLflow")
+            print("✅ Binary model saved to MLflow")
 
+        elif CLASSIFICATION=='cat':
+            mlflow.tensorflow.log_model(
+                model=model,
+                artifact_path="tmp/mlartifacts",
+                registered_model_name="skin project categorical model"
+            )
+
+            print("✅ Categorical model saved to MLflow")
+
+        else :
+            print("❌ Please select a classification 'binary' or 'cat'")
         return None
 
     return None
