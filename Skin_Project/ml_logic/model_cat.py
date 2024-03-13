@@ -15,7 +15,7 @@ def initialize_model():
         model = Sequential()
         model.add(layers.Conv2D(filters=96, kernel_size=(11, 11),
                             strides=(4, 4), activation="relu",
-                            input_shape=(128, 128, 3)))
+                            input_shape=(IMAGE_SIZE, IMAGE_SIZE, 3)))
         model.add(layers.BatchNormalization())
         model.add(layers.MaxPool2D(pool_size=(3, 3), strides= (2, 2)))
         model.add(layers.Conv2D(filters=256, kernel_size=(5, 5),
@@ -44,52 +44,36 @@ def initialize_model():
         return model
 
     if CLASSIFICATION == 'binary':
-
-        # First convolutional layer
-        model.add(layers.Conv2D(filters = 64, kernel_size = (5,5), padding = "same", activation = "relu", input_shape = (IMAGE_SIZE,IMAGE_SIZE,3)))
-
-        # Max pooling layer
-        model.add(layers.MaxPool2D(pool_size = (2,2)))
-        # Second convolutional layer
-        model.add(layers.Conv2D(filters = 64,
-                kernel_size = (3,3),
-                padding = "same",
-                activation = "relu"))
-
-        # Max pooling layer
-        model.add(layers.MaxPool2D(pool_size = (2,2)))
-
-        # Third convolutional layer
-        model.add(layers.Conv2D(filters = 32,
-                kernel_size = (3,3),
-                padding = "same",
-                activation = "relu"))
-
-        # Max pooling layer
-        model.add(layers.MaxPool2D(pool_size = (2,2)))
-
-        # Fourth convolutional layer
-        model.add(layers.Conv2D(filters = 256,
-                kernel_size = (3,3),
-                padding = "same",
-                activation = "relu"))
-
-        # Max pooling layer
-        model.add(layers.MaxPool2D(pool_size = (2,2)))
-
-
-        # Flattening layer
+        model = Sequential()
+        model.add(layers.Conv2D(filters=96, kernel_size=(11, 11),
+                            strides=(4, 4), activation="relu",
+                            input_shape=(IMAGE_SIZE, IMAGE_SIZE, 3)))
+        model.add(layers.BatchNormalization())
+        model.add(layers.MaxPool2D(pool_size=(3, 3), strides= (2, 2)))
+        model.add(layers.Conv2D(filters=256, kernel_size=(5, 5),
+                            strides=(1, 1), activation="relu",
+                            padding="same"))
+        model.add(layers.BatchNormalization())
+        model.add(layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2)))
+        model.add(layers.Conv2D(filters=384, kernel_size=(3, 3),
+                            strides=(1, 1), activation="relu",
+                            padding="same"))
+        model.add(layers.BatchNormalization())
+        model.add(layers.Conv2D(filters=384, kernel_size=(3, 3),
+                            strides=(1, 1), activation="relu",
+                            padding="same"))
+        model.add(layers.BatchNormalization())
+        model.add(layers.Conv2D(filters=256, kernel_size=(3, 3),
+                            strides=(1, 1), activation="relu",
+                            padding="same"))
+        model.add(layers.BatchNormalization())
+        model.add(layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2)))
         model.add(layers.Flatten())
+        model.add(layers.Dense(4096, activation="relu"))
+        model.add(layers.Dropout(0.5))
 
-        # Dense layer
-        model.add(layers.Dense(units = 128,
-                    activation = "relu"))
-
-        # Output layer
-        model.add(layers.Dense(1, activation='sigmoid'))
-
+        model.add(layers.Dense(1, activation="sigmoid"))
         return model
-
 
 def compile_model(model: Model) -> Model:
     """
@@ -117,7 +101,7 @@ def train_model(
         X: np.ndarray,
         y: np.ndarray,
         batch_size=256,
-        patience=10,
+        patience=30,
         validation_data=None, # overrides validation_split
         validation_split=0.3):
     """
