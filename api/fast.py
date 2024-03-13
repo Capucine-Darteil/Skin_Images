@@ -14,11 +14,13 @@ import tensorflow as tf
 from pydantic import BaseModel
 import pickle
 import json
+from typing import Annotated, Optional
 
-# class Item(BaseModel):
-#     sex: str
-#     age: int
-#     localization: str
+
+class Item(BaseModel):
+    sex: str
+    age: int
+    localization: str
 
 app = FastAPI()
 
@@ -70,45 +72,50 @@ async def custom_binary_classification(img: UploadFile=File(...)):
 @app.post('/multiclass_classification')
 async def custom_multiclass_predict(img: UploadFile=File(...)):
 
-    contents = await img.read()
-    image = np.fromstring(contents, np.uint8)
-    image=cv2.imdecode(image, cv2.IMREAD_COLOR)
+    multi_contents = await img.read()
+    multi_image = np.fromstring(multi_contents, np.uint8)
+    multi_image=cv2.imdecode(multi_image, cv2.IMREAD_COLOR)
 
     local_best_model_path_cat = f"{CHEMIN_CAT}/best_model.h5"
     multiclass_model = tf.keras.models.load_model(local_best_model_path_cat)
 
-    multi_image_resized = cv2.resize(image, (128,128))
+    multi_image_resized = cv2.resize(multi_image, (128,128))
 
-    multi_new_image =multi_image_resized/255
+    multi_new_image = multi_image_resized / 255
     multi_new_image = np.array(multi_new_image).reshape(1, 128,128, 3)
+
     multi_prediction = multiclass_model.predict(multi_new_image)
-    cat_pred = np.argmax(multi_prediction[0])
+    cat_pred = np.argmax(multi_prediction[0])-1
 
     multiclass_dict = {4:'Nævus mélanocytaire', 6:'Mélanome', 2:'Kératose séborrhéique', 1:'Carcinome basocellulaire', 0:'Kératose actinique', 5:'Lésion vasculaire', 3:'Dermatofibrome'}
     mole_type = multiclass_dict[cat_pred]
 
     return Response(content=mole_type)
 
-# data1 = {
-#     "sex":"male",
-#     "age":20,
-#     "localization":"neck"
-# }
 
 @app.post('/predict_metadata')
-async def custom_predict_metadata(img: UploadFile=File(...),data: str = Form(...)):
-    data_dict = json.loads(data)
+async def custom_predict_metadata(sex: Annotated[str, Form()],
+    age: Annotated[int, Form()], localization: Annotated[str, Form()],img: UploadFile = File(...),):
 
-    if "sex" in data_dict:
-        data_dict["sex"] = data_dict["sex"].upper()
-    # Process image
-    # processed_image_bytes = process_image(await image.read())
+    contents = await img.read()
+    image = np.fromstring(contents, np.uint8)
+    image=cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-    # Process data (example: convert to uppercase)
-    # processed_data = f"Received data: {data_dict}"
-    # processed_data = f"Received sex: {data_dict.get('sex', 'Not provided')}"
+    # multi_image_resized = cv2.resize(image, (128,128))
 
-    return {"processed_data": f"Received sex: {data_dict.get('sex', 'Not provided')}"}
+    # multi_new_image =multi_image_resized/255
+    # multi_new_image = np.array(multi_new_image).reshape(1, 128,128, 3)
+    # multi_prediction = multiclass_model.predict(multi_new_image)
+    # cat_pred = np.argmax(multi_prediction[0])
+
+    inputs = {
+        "age": age,
+        "sex": sex,
+        "location": localization
+    }
+
+
+    return inputs
 
 
 # @app.post('/predict_metadata')
