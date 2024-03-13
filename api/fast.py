@@ -47,9 +47,12 @@ async def custom_binary_classification(img: UploadFile=File(...)):
     image=cv2.imdecode(image, cv2.IMREAD_COLOR)
 
 
-    binary_model = load_best_model()
+    # binary_model = load_best_model()
 
-    image_resized = cv2.resize(image, (64,64))
+    local_best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
+    binary_model = tf.keras.models.load_model(local_best_model_path)
+
+    image_resized = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE))
 
     threshold = THRESHOLD
 
@@ -60,7 +63,7 @@ async def custom_binary_classification(img: UploadFile=File(...)):
     if prediction[0][0] < float(threshold) :
         result=('Not dangerous')
     else:
-        result=('Yuck! You better go check that')
+        result=('It does not look well. It will be better if you go check that out')
 
     return Response(content=result)
 
@@ -71,8 +74,8 @@ async def custom_multiclass_predict(img: UploadFile=File(...)):
     image = np.fromstring(contents, np.uint8)
     image=cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-    local_best_model_path = f"{CHEMIN_CAT}/best_model.h5"
-    multiclass_model = tf.keras.models.load_model(local_best_model_path)
+    local_best_model_path_cat = f"{CHEMIN_CAT}/best_model.h5"
+    multiclass_model = tf.keras.models.load_model(local_best_model_path_cat)
 
     multi_image_resized = cv2.resize(image, (128,128))
 
@@ -109,41 +112,6 @@ async def custom_predict_metadata(img: UploadFile=File(...),data: str = Form(...
 
 
 # @app.post('/predict_metadata')
-# async def custom_predict_metadata(img: UploadFile=File(...),data: str = Form(...)):
-#     print('test')
-
-#     with open('/home/pavel/code/Capucine-Darteil/Skin_Images/api/preproc.pkl', 'rb') as file:
-#         load_preproc = pickle.load(file)
-
-
-#     contents = await img.read()
-#     image = np.fromstring(contents, np.uint8)
-#     image=cv2.imdecode(image, cv2.IMREAD_COLOR)
-
-#     data = json.loads(data)
-
-#     age = data['age']
-#     sex = data['sex']
-#     localization = data['localization']
-
-#     # # Create the dict
-#     X_dict = {
-#         'age': age,
-#         'sex': sex.lower(),
-#         'localization': localization.lower()
-#     }
-
-#     # Create the pandas DataFrame
-#     df_X = pd.DataFrame(X_dict,index=[0])
-#     new_x = load_preproc.transform(df_X)
-
-#     test_comm = new_x[0][0]
-
-#     return new_x[0][0]
-#     # return Response(content=test_comm)
-=======
-
-# @app.post('/predict_metadata')
 # async def custom_predict_metadata(data,img: UploadFile=File(...)):
 #     print('test')
 
@@ -172,42 +140,3 @@ async def custom_predict_metadata(img: UploadFile=File(...),data: str = Form(...
 #     new_x = load_preproc.transform(df_X)
 
 #     return new_x[0][0]
-
-'''
-@app.post("/image")
-def image_process(CHEMIN_TEST,gender,age,location):
-    image = get_data(CHEMIN_TEST)
-    image_resized = resize_data(image,int(IMAGE_SIZE))
-    new_image_processed = flat_images(image_resized)
-    new_image_processed = new_image_processed.reset_index()
-    new_image_processed = new_image_processed.drop(columns='index')
-    metadata_dict = {'Age':age,'Sex':gender, 'Localization':location}
-    image_metadata = pd.DataFrame(metadata_dict,index=[0])
-    df_new_image = pd.concat([image_metadata,new_image_processed],axis=1)
-
-    return df_new_image
-
-def custom_binary_predict(df_new_image,THRESHOLD):
-    model = load_best_model()
-    threshold = THRESHOLD
-    df_new_image = df_new_image.drop(columns=['Age', 'Sex', 'Localization'])
-    df_new_image = df_new_image/255
-    df_new_image = np.array(df_new_image).reshape(len(df_new_image), IMAGE_SIZE, IMAGE_SIZE, 3)
-    prediction = model.predict(df_new_image)
-    print(prediction)
-    if prediction[0][0] < float(threshold) :
-        return 0
-    else:
-        return 1
-
-def custom_multiclass_predict(df_new_image):
-    model = load_best_model()
-    df_new_image = df_new_image.drop(columns=['Age', 'Sex', 'Localization'])
-    df_new_image = df_new_image/255
-    df_new_image = np.array(df_new_image).reshape(len(df_new_image), IMAGE_SIZE, IMAGE_SIZE, 3)
-    prediction = model.predict(df_new_image)
-    cat_pred = np.argmax(prediction[0])
-    multiclass_dict = {4:'Nævus mélanocytaire', 6:'Mélanome', 2:'Kératose séborrhéique', 1:'Carcinome basocellulaire', 0:'Kératose actinique', 5:'Lésion vasculaire', 3:'Dermatofibrome'}
-    multiclass_dict[cat_pred]
-    return cat_pred
-'''
