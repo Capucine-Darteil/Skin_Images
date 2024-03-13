@@ -61,42 +61,33 @@ if img_file_buffer is not None:
                     ### Display the image returned by the API
                             final = res.content
                             st.markdown(final.decode('utf-8'))
+                            # st.markdown(final)
                         else:
                             st.markdown("**Oops**, something went wrong 😓 Please try again.")
                             print(res.status_code, res.content)
-
-
-
-
-
-# with open('data.json', 'w') as fp:
-#     json.dump(data, fp)
-
-# with open('data.json', 'rb') as fp:
-#     json_data = json.load(fp)
-# st.write(json_data)
-# st.write(type(json_data))
 
 
 sex = st.selectbox('Your sex:',('Male', 'Female'))
 age = st.number_input('Your age:', key=int,min_value=1, max_value=99)
 localization = st.selectbox('The localization of the mole:', ('Lower extremity', 'Trunk', 'Upper extremity', 'Scalp', 'Abdomen', 'Ear', 'Back', 'Face','Chest','Foot','Neck','Scalp','Hand','Genital','Acral'))
 
+inputs = {"sex": sex, "age": age, "localization": localization}
 
 if st.button("Analyze Mole"):
     if img_file_buffer is not None:
         img_bytes = img_file_buffer.getvalue()
-        data = {"sex": sex, "age": int(age), "localization": localization}
+
         # Send image and data to API
         files = {'image': img_file_buffer}
-        response = requests.post(API_URL + "/predict_metadata", files={'image': img_bytes},data={'data':json.dumps(data)})
+        response = requests.post(API_URL + "/predict_metadata", data=inputs, files={'img': img_bytes})
+        st.write(response.content)
 
-        # Handle response
-        if response.status_code == 200:
-            processed_data = response.json().get('processed_data', 'No data found')
-            st.write(processed_data)
-        else:
-            st.error("An error occurred during metadata analysis.")
+        # # Handle response
+        # if response.status_code == 200:
+        #     processed_data = response.json().get('processed_data', 'No data found')
+        #     st.write(processed_data)
+        # else:
+        #     st.error("An error occurred during metadata analysis.")
 
 
 
