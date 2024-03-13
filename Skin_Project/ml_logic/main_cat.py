@@ -48,9 +48,6 @@ def preprocess():
     #df = drop_columns(df)
     #print('columns dropped')
 
-    if CLASSIFICATION == 'binary':
-        df= labelize(df)
-        print('labelized ok')
 
     if SAMPLE_SIZE != 1.0 :
         df = sampler(df)
@@ -58,9 +55,20 @@ def preprocess():
 
 
     if METADATA == 'yes':
+
         #categorize
         df = categorize(df)
         print('dataframe categorized...')
+
+        df.reset_index(inplace=True)
+        print('index reset ...')
+
+        df = df.drop(columns='index')
+        print('index dropped')
+
+        if CLASSIFICATION == 'binary':
+            df= labelize(df)
+            print('labelized ok')
 
         #drop nan values
         df = df.dropna()
@@ -107,6 +115,10 @@ def preprocess():
         return X_train_pixel, X_test_pixel, X_train_cat, X_test_cat, y_train_pixel, y_test_pixel, y_train_cat, y_test_cat
 
     if METADATA == 'no':
+        if CLASSIFICATION == 'binary':
+            df= labelize(df)
+            print('labelized ok')
+
         preprocess = preproc(df, 'dx')
         df_processed = pd.DataFrame(preprocess.fit_transform(df), columns = preprocess.get_feature_names_out())
 
@@ -225,7 +237,9 @@ def train():
 
     elif METADATA == 'yes':
         X_train_pixel, X_test_pixel, X_train_cat, X_test_cat, y_train_pixel, y_test_pixel, y_train_cat, y_test_cat = preprocess()
+        y_train_pixel = np.array(y_train_pixel).reshape(y_train_pixel.shape[0])
 
+        print (y_train_pixel)
         model = initialize_model()
         print('model cnn initialized...')
 
