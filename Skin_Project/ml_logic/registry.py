@@ -6,6 +6,7 @@ from tensorflow import keras
 import mlflow
 from Skin_Project.params import *
 from mlflow.tracking import MlflowClient
+from keras.models import load_model
 
 def save_model(model: keras.Model = None) -> None:
     """
@@ -22,14 +23,26 @@ def save_model(model: keras.Model = None) -> None:
     print("Model saved locally")
 
     if MODEL_TARGET == "mlflow":
-        mlflow.tensorflow.log_model(
-            model=model,
-            artifact_path="tmp/mlartifacts",
-            registered_model_name="skin project binary model"
-        )
+        if CLASSIFICATION=="binary":
+            mlflow.tensorflow.log_model(
+                model=model,
+                artifact_path="tmp/mlartifacts",
+                registered_model_name="skin project binary model"
+            )
 
-        print("✅ Binary model saved to MLflow")
+            print("✅ Binary model saved to MLflow")
 
+        elif CLASSIFICATION=='cat':
+            mlflow.tensorflow.log_model(
+                model=model,
+                artifact_path="tmp/mlartifacts",
+                registered_model_name="skin project categorical model"
+            )
+
+            print("✅ Categorical model saved to MLflow")
+
+        else :
+            print("❌ Please select a classification 'binary' or 'cat'")
         return None
 
     return None
@@ -45,38 +58,79 @@ def load_best_model():
     Return None (but do not Raise) if no model is found
 
     """
+    if METADATA == 'no':
+        if MODEL_TARGET == "local":
 
-    if MODEL_TARGET == "local":
+            if CLASSIFICATION == 'binary':
+                # Get the latest model version name by the timestamp on disk
+                local_best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
 
-        if CLASSIFICATION == 'binary':
-            # Get the latest model version name by the timestamp on disk
-            local_best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
+                if not local_best_model_path:
+                    print('No best model saved yet')
+                    return None
 
-            if not local_best_model_path:
-                print('No best model saved yet')
-                return None
+                best_model = load_model(local_best_model_path)
 
-            best_model = keras.models.load_model(local_best_model_path)
+                print("Best model for binary classification loaded from local disk")
 
-            print("Best model for binary classification loaded from local disk")
+                return best_model
 
-            return best_model
+            if CLASSIFICATION == 'cat':
+                # Get the latest model version name by the timestamp on disk
+                local_best_model_path = f"{CHEMIN_CAT}/best_model.h5"
 
-        if CLASSIFICATION == 'cat':
-            # Get the latest model version name by the timestamp on disk
-            local_best_model_path = f"{CHEMIN_CAT}/best_model.h5"
+                if not local_best_model_path:
+                    print('No best model saved yet')
+                    return None
 
-            if not local_best_model_path:
-                print('No best model saved yet')
-                return None
+                best_model = load_model(local_best_model_path)
 
-            best_model = keras.models.load_model(local_best_model_path)
+                print("Best model for multiclass classification loaded from local disk")
 
-            print("Best model for multiclass classification loaded from local disk")
+                return best_model
+        pass
 
-            return best_model
-    pass
+    elif METADATA == 'yes':
+        if MODEL_TARGET == "local":
 
+            if CLASSIFICATION == 'binary':
+                # Get the latest model version name by the timestamp on disk
+                local_best_model_path = f"{CHEMIN_META_BINARY}/best_model.h5"
+
+                if not local_best_model_path:
+                    print('No best model saved yet')
+                    return None, None
+
+                best_model = load_model(local_best_model_path)
+
+                print("Best model cnn for binary classification loaded from local disk")
+
+                local_best_model_ml_path = f"{CHEMIN_META_BINARY}/best_model_ml.h5"
+                best_model_ml = load_model(local_best_model_ml_path)
+
+                print("Best model ml for binary classification loaded from local disk")
+
+                return best_model, best_model_ml
+
+            if CLASSIFICATION == 'cat':
+                # Get the latest model version name by the timestamp on disk
+                local_best_model_path = f"{CHEMIN_META_CAT}/best_model.h5"
+
+                if not local_best_model_path:
+                    print('No best model saved yet')
+                    return None, None
+
+                best_model = load_model(local_best_model_path)
+
+                print("Best model for multiclass classification loaded from local disk")
+
+                local_best_model_ml_path = f"{CHEMIN_META_CAT}/best_model_ml.h5"
+                best_model_ml = load_model(local_best_model_ml_path)
+
+                print("Best model ml for multiclass classification loaded from local disk")
+
+                return best_model, best_model_ml
+        pass
 
 
 def load_model(stage="Production") -> keras.Model:
@@ -100,7 +154,7 @@ def load_model(stage="Production") -> keras.Model:
         most_recent_model_path_on_disk = sorted(local_model_paths)[-1]
         print('local_model_paths',local_model_paths)
 
-        latest_model = keras.models.load_model(most_recent_model_path_on_disk)
+        latest_model = load_model(most_recent_model_path_on_disk)
 
         print("Model loaded from local disk")
 

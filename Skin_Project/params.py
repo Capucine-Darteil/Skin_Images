@@ -7,6 +7,8 @@ CHEMIN_3 = os.environ.get('CHEMIN_3')
 CHEMIN_4 = os.environ.get('CHEMIN_4')
 CHEMIN_BINARY = os.environ.get('CHEMIN_BINARY')
 CHEMIN_CAT = os.environ.get('CHEMIN_CAT')
+CHEMIN_META_BINARY = os.environ.get('CHEMIN_META_BINARY')
+CHEMIN_META_CAT = os.environ.get('CHEMIN_META_CAT')
 CHEMIN_METADATA = os.environ.get('CHEMIN_METADATA')
 CHEMIN_TEST = os.environ.get('CHEMIN_TEST')
 MODEL_TARGET = os.environ.get("MODEL_TARGET")
@@ -23,4 +25,3 @@ API_URL = os.environ.get("API_URL")
 IMAGE_DIR = os.environ.get("IMAGE_DIR")
 
 METADATA=os.environ.get("METADATA")
-
