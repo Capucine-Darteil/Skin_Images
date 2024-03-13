@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Body, Form
 from fastapi.middleware.cors import CORSMiddleware
 from Skin_Project.ml_logic.registry import load_model
 from PIL import Image
@@ -92,6 +92,56 @@ async def custom_multiclass_predict(img: UploadFile=File(...)):
 #     "localization":"neck"
 # }
 
+@app.post('/predict_metadata')
+async def custom_predict_metadata(img: UploadFile=File(...),data: str = Form(...)):
+    data_dict = json.loads(data)
+
+    if "sex" in data_dict:
+        data_dict["sex"] = data_dict["sex"].upper()
+    # Process image
+    # processed_image_bytes = process_image(await image.read())
+
+    # Process data (example: convert to uppercase)
+    # processed_data = f"Received data: {data_dict}"
+    # processed_data = f"Received sex: {data_dict.get('sex', 'Not provided')}"
+
+    return {"processed_data": f"Received sex: {data_dict.get('sex', 'Not provided')}"}
+
+
+# @app.post('/predict_metadata')
+# async def custom_predict_metadata(img: UploadFile=File(...),data: str = Form(...)):
+#     print('test')
+
+#     with open('/home/pavel/code/Capucine-Darteil/Skin_Images/api/preproc.pkl', 'rb') as file:
+#         load_preproc = pickle.load(file)
+
+
+#     contents = await img.read()
+#     image = np.fromstring(contents, np.uint8)
+#     image=cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+#     data = json.loads(data)
+
+#     age = data['age']
+#     sex = data['sex']
+#     localization = data['localization']
+
+#     # # Create the dict
+#     X_dict = {
+#         'age': age,
+#         'sex': sex.lower(),
+#         'localization': localization.lower()
+#     }
+
+#     # Create the pandas DataFrame
+#     df_X = pd.DataFrame(X_dict,index=[0])
+#     new_x = load_preproc.transform(df_X)
+
+#     test_comm = new_x[0][0]
+
+#     return new_x[0][0]
+#     # return Response(content=test_comm)
+=======
 
 # @app.post('/predict_metadata')
 # async def custom_predict_metadata(data,img: UploadFile=File(...)):
