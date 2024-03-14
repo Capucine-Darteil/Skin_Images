@@ -237,7 +237,7 @@ def train():
 
     elif METADATA == 'yes':
         X_train_pixel, X_test_pixel, X_train_cat, X_test_cat, y_train_pixel, y_test_pixel, y_train_cat, y_test_cat = preprocess()
-        y_train_pixel = np.array(y_train_pixel).reshape(y_train_pixel.shape[0])
+        y_train_pixel = tf.cast(y_train_pixel, dtype=tf.float32)
 
         print (y_train_pixel)
         model = initialize_model()
@@ -285,31 +285,31 @@ def train():
                                           X_test_pixel=X_test_pixel, weight_cnn=0.9)
             print(f'new metrics are : {accuracy, recall}')
 
-            if best_recall>recall and accuracy>0.5:
-                if CLASSIFICATION == 'binary':
-                    best_model_path = f"{CHEMIN_META_BINARY}/best_model.h5"
-                    model.save(best_model_path)
-                    print("New best model cnn (binary) !")
+            #if best_recall>recall and accuracy>0.5:
+                #if CLASSIFICATION == 'binary':
+                 #   best_model_path = f"{CHEMIN_META_BINARY}/best_model.h5"
+                  #  model.save(best_model_path)
+                   # print("New best model cnn (binary) !")
 
-                    best_model_ml_path = f"{CHEMIN_META_BINARY}/best_model_ml.h5"
-                    model.save(best_model_ml_path)
-                    print("First model ml is saved as best model !")
+                    #best_model_ml_path = f"{CHEMIN_META_BINARY}/best_model_ml.h5"
+                    #model.save(best_model_ml_path)
+                    #print("First model ml is saved as best model !")
 
-                    return accuracy, recall
+                    #return accuracy, recall
 
-                if CLASSIFICATION == 'cat':
-                    best_model_path = f"{CHEMIN_META_CAT}/best_model.h5"
-                    model.save(best_model_path)
-                    print("New best model cnn (multiclass) !")
+                #if CLASSIFICATION == 'cat':
+                 #   best_model_path = f"{CHEMIN_META_CAT}/best_model.h5"
+                  #  model.save(best_model_path)
+                   # print("New best model cnn (multiclass) !")
 
-                    best_model_ml_path = f"{CHEMIN_META_CAT}/best_model_ml.h5"
-                    model.save(best_model_ml_path)
-                    print("First model ml is saved as best model !")
-                    return accuracy, recall
+                    #best_model_ml_path = f"{CHEMIN_META_CAT}/best_model_ml.h5"
+                    #model.save(best_model_ml_path)
+                    #print("First model ml is saved as best model !")
+                    #return accuracy, recall
 
-            else :
-                print('The new model is not better than the best model, try again ! :(')
-                return best_accuracy, best_recall
+            #else :
+             #   print('The new model is not better than the best model, try again ! :(')
+             #   return best_accuracy, best_recall
 
         elif MODEL_TARGET == 'mlflow':
             best_model = load_model()
