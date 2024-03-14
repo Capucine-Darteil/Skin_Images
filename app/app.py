@@ -10,7 +10,7 @@ import json
 st.markdown("<h1 style='text-align: center; color: violet;'>Mole type detector</h1>", unsafe_allow_html=True)
 
 st.markdown("""<style>.subheader {font-size:20px !important;}</style>""", unsafe_allow_html=True)
-st.markdown('<p style="text-align:center;"class="subheader", >Disclaimer : this tool is not intended to replace the expertise of a doctor</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center;"class="subheader", >⚠️ Disclaimer : this tool is not intended to replace the expertise of a doctor ⚠️</p>', unsafe_allow_html=True)
 
 st.markdown(
     """
@@ -28,11 +28,6 @@ st.markdown('<p style="class="subheader_2", >Please upload your mole photo</p>',
 img_file_buffer = st.file_uploader('Upload an image',type=["png", "jpg", "jpeg"])
 
 if img_file_buffer is not None :
-    # img = Image.open(img_file_buffer)
-    # st.markdown(f'<div style="text-align:center"><img src="data:image/png;base64,{img_file_buffer}" alt="Uploaded Image" style="width: 50%;"></div>',
-    # unsafe_allow_html=True)
-    # st.write("Here's the image you uploaded ☝️")
-
     st.image(Image.open(img_file_buffer), caption="Here's the image you uploaded ☝️")
 
 if img_file_buffer is not None:
@@ -67,9 +62,9 @@ if img_file_buffer is not None:
                             print(res.status_code, res.content)
 
 
-sex = st.selectbox('Your sex:',('Male', 'Female'))
-age = st.number_input('Your age:', key=int,min_value=1, max_value=99)
-localization = st.selectbox('The localization of the mole:', ('Lower extremity', 'Trunk', 'Upper extremity', 'Scalp', 'Abdomen', 'Ear', 'Back', 'Face','Chest','Foot','Neck','Scalp','Hand','Genital','Acral'))
+sex = st.selectbox('What is your sex:',('Female', 'Male'))
+age = st.number_input('What is your age? (Please put an age between 1 and 99 years):', key=int,min_value=1, max_value=99)
+localization = st.selectbox('Where is the mole located on your body?:', ('Lower extremity', 'Trunk', 'Upper extremity', 'Scalp', 'Abdomen', 'Ear', 'Back', 'Face','Chest','Foot','Neck','Scalp','Hand','Genital','Acral'))
 
 inputs = {"sex": sex, "age": age, "localization": localization}
 
