@@ -7,10 +7,24 @@ import numpy as np
 from io import StringIO
 import json
 
-st.markdown("<h1 style='text-align: center; color: violet;'>Mole type detector</h1>", unsafe_allow_html=True)
+def set_background_color(color):
+    hex_color = f"#{color}"
+    custom_css = f"""
+        <style>
+            .stApp {{
+                background-color: {hex_color};
+            }}
+        </style>
+    """
+    st.markdown(custom_css, unsafe_allow_html=True)
+
+# Set background color
+set_background_color("eae8fa")
+
+st.markdown("<h1 style='text-align: center; color: #A0325B;'>Mole type detector</h1>", unsafe_allow_html=True)
 
 st.markdown("""<style>.subheader {font-size:20px !important;}</style>""", unsafe_allow_html=True)
-st.markdown('<p style="text-align:center;"class="subheader", >⚠️ Disclaimer : this tool is not intended to replace the expertise of a doctor ⚠️</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; color: #5763CF;"class="subheader", >⚠️ Disclaimer : this tool is not intended to replace the expertise of a doctor ⚠️</p>', unsafe_allow_html=True)
 
 st.markdown(
     """
@@ -23,44 +37,45 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
 st.markdown("""<style>.subheader_2 {font-size:15px !important;}</style>""", unsafe_allow_html=True)
 st.markdown('<p style="class="subheader_2", >Please upload your mole photo</p>', unsafe_allow_html=True)
-img_file_buffer = st.file_uploader('Upload an image',type=["png", "jpg", "jpeg"])
 
+img_file_buffer = st.file_uploader('Upload an image',type=["png", "jpg", "jpeg"])
 if img_file_buffer is not None :
-    st.image(Image.open(img_file_buffer), caption="Here's the image you uploaded ☝️")
+    image = Image.open(img_file_buffer)
+    col1, col2, col3 = st.columns([1, 4, 1])
+    with col2:
+        st.image(image, caption="Here's the image you uploaded ☝️", use_column_width=True)
+
 
 if img_file_buffer is not None:
-    col1, col2= st.columns(2)
-    with col1:
-        if st.button('Predict binary classification'):
-            with st.spinner("Predict binary classification"):
+    if st.button('Is it dangerous?'):
+        with st.spinner("Wait for it..."):
+                img_bytes = img_file_buffer.getvalue()
+                res = requests.post(API_URL + "/binary_classification", files={'img': img_bytes})
+
+                if res.status_code == 200:
+            ### Display the image returned by the API
+                    final = res.content
+                    st.markdown(final.decode('utf-8'))
+                else:
+                    st.markdown("**Oops**, something went wrong 😓 Please try again.")
+                    print(res.status_code, res.content)
+
+    if st.button('What kind of mole type it looks like?'):
+        with st.spinner("Wait for it..."):
                     img_bytes = img_file_buffer.getvalue()
-                    res = requests.post(API_URL + "/binary_classification", files={'img': img_bytes})
+                    res = requests.post(API_URL + "/multiclass_classification", files={'img': img_bytes})
 
                     if res.status_code == 200:
                 ### Display the image returned by the API
                         final = res.content
                         st.markdown(final.decode('utf-8'))
+                        # st.markdown(final)
                     else:
                         st.markdown("**Oops**, something went wrong 😓 Please try again.")
                         print(res.status_code, res.content)
-
-    with col2:
-        if st.button('Predict multiclass'):
-            with st.spinner("Wait for it..."):
-                        img_bytes = img_file_buffer.getvalue()
-                        res = requests.post(API_URL + "/multiclass_classification", files={'img': img_bytes})
-
-                        if res.status_code == 200:
-                    ### Display the image returned by the API
-                            final = res.content
-                            st.markdown(final.decode('utf-8'))
-                            # st.markdown(final)
-                        else:
-                            st.markdown("**Oops**, something went wrong 😓 Please try again.")
-                            print(res.status_code, res.content)
-
 
 sex = st.selectbox('What is your sex:',('Female', 'Male'))
 age = st.number_input('What is your age? (Please put an age between 1 and 99 years):', key=int,min_value=1, max_value=99)
