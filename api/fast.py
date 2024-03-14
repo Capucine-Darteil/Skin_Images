@@ -48,9 +48,6 @@ async def custom_binary_classification(img: UploadFile=File(...)):
     image = np.fromstring(contents, np.uint8)
     image=cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-
-    # binary_model = load_best_model()
-
     local_best_model_path = f"{CHEMIN_BINARY}/best_model.h5"
     binary_model = tf.keras.models.load_model(local_best_model_path)
 
@@ -63,9 +60,9 @@ async def custom_binary_classification(img: UploadFile=File(...)):
     prediction = binary_model.predict(df_new_image)
 
     if prediction[0][0] < float(threshold) :
-        result=('Not dangerous')
+        result=('It does not look dangerous')
     else:
-        result=('It does not look well. It will be better if you go check that out')
+        result=('It will be better if you go check that out')
 
     return Response(content=result)
 
@@ -79,18 +76,23 @@ async def custom_multiclass_predict(img: UploadFile=File(...)):
     local_best_model_path_cat = f"{CHEMIN_CAT}/best_model.h5"
     multiclass_model = tf.keras.models.load_model(local_best_model_path_cat)
 
-    multi_image_resized = cv2.resize(multi_image, (128,128))
+    multi_image_resized = cv2.resize(multi_image, (IMAGE_SIZE, IMAGE_SIZE))
 
     multi_new_image = multi_image_resized / 255
-    multi_new_image = np.array(multi_new_image).reshape(1, 128,128, 3)
+    multi_new_image = np.array(multi_new_image).reshape(1, IMAGE_SIZE, IMAGE_SIZE, 3)
 
     multi_prediction = multiclass_model.predict(multi_new_image)
     cat_pred = np.argmax(multi_prediction[0])-1
 
-    multiclass_dict = {4:'Nævus mélanocytaire', 6:'Mélanome', 2:'Kératose séborrhéique', 1:'Carcinome basocellulaire', 0:'Kératose actinique', 5:'Lésion vasculaire', 3:'Dermatofibrome'}
+    multiclass_dict = {4:'Melanocytic nevus', 6:'Melanoma', 2:'Seborrheic keratosis', 1:'Basal cell carcinoma', 0:'Actinic keratosis', 5:'Vascular lesion', 3:'Dermatofibrome'}
     mole_type = multiclass_dict[cat_pred]
 
     return Response(content=mole_type)
+
+@app.get('/ping')
+def Ping():
+    return 'Pong'
+
 
 
 @app.post('/predict_metadata')
@@ -101,22 +103,56 @@ async def custom_predict_metadata(sex: Annotated[str, Form()],
     image = np.fromstring(contents, np.uint8)
     image=cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-    # multi_image_resized = cv2.resize(image, (128,128))
+    local_best_model_path_cat = f"{CHEMIN_CAT}/best_model.h5"
+    multiclass_model = tf.keras.models.load_model(local_best_model_path_cat)
 
-    # multi_new_image =multi_image_resized/255
-    # multi_new_image = np.array(multi_new_image).reshape(1, 128,128, 3)
-    # multi_prediction = multiclass_model.predict(multi_new_image)
-    # cat_pred = np.argmax(multi_prediction[0])
+    multi_image_resized = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE))
+
+    multi_new_image = multi_image_resized / 255
+    multi_new_image = np.array(multi_new_image).reshape(1, IMAGE_SIZE, IMAGE_SIZE, 3)
+
+    cnn_prediction = multiclass_model.predict(multi_new_image)
 
     inputs = {
         "age": age,
-        "sex": sex,
-        "location": localization
+        "sex": sex.lower(),
+        "localization": localization.lower()
     }
 
+    # age = inputs['age']
+    # sex = inputs['sex']
+    # localization = inputs['localization']
 
-    return inputs
+    # # Create the dict
+    # X_dict = {
+    #     'age': age,
+    #     'sex': sex.lower(),
+    #     'localization': localization.lower()
+    # }
 
+    with open('/home/pavel/code/Capucine-Darteil/Skin_Images/api/preproc.pkl', 'rb') as file:
+        load_preproc = pickle.load(file)
+
+    # Create the pandas DataFrame
+    df_X = pd.DataFrame(inputs,index=[0])
+    new_x = load_preproc.transform(df_X)
+
+    # local_best_model_path_meta = f"{CHEMIN_META_CAT}/best_model.h5"
+    # meta_multiclass_model = tf.keras.models.load_model(local_best_model_path_meta)
+
+    # y_pred_gcb = meta_multiclass_model.predict_proba(new_x)
+
+    # weight_cnn = 0.9
+
+    # y_pred = np.asarray(cnn_prediction) * weight_cnn + np.asarray(y_pred_gcb) * (1-weight_cnn)
+    # cat_pred = np.argmax(y_pred[0])-1
+
+    # multiclass_dict = {4:'Melanocytic nevus', 6:'Melanoma', 2:'Seborrheic keratosis', 1:'Basal cell carcinoma', 0:'Actinic keratosis', 5:'Vascular lesion', 3:'Dermatofibrome'}
+    # mole_type = multiclass_dict[cat_pred]
+
+    # return Response(content=mole_type)
+    test = new_x[0][0]
+    return test
 
 # @app.post('/predict_metadata')
 # async def custom_predict_metadata(data,img: UploadFile=File(...)):
