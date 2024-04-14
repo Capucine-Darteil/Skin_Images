@@ -91,29 +91,3 @@ if st.button("Analyze Mole"):
         files = {'image': img_file_buffer}
         response = requests.post(API_URL + "/predict_metadata", data=inputs, files={'img': img_bytes})
         st.write(response.content)
-
-        # # Handle response
-        # if response.status_code == 200:
-        #     processed_data = response.json().get('processed_data', 'No data found')
-        #     st.write(processed_data)
-        # else:
-        #     st.error("An error occurred during metadata analysis.")
-
-
-
-# if img_file_buffer is not None:
-#     if st.button('Predict with metadata'):
-#         with st.spinner("Wait for it..."):
-#             img_bytes = img_file_buffer.getvalue()
-#             st.write("yoooooo")
-#             res = requests.post(API_URL + "/predict_metadata", data=data, files={'img': img_bytes})
-
-#             st.write(res)
-#             if res.status_code == 200:
-#                 ### Display the image returned by the API
-#                 final = res.content
-#                 st.markdown(final)
-#                         # st.markdown(final.decode('utf-8'))
-#             else:
-#                 st.markdown("**Oops**, something went wrong 😓 Please try again.")
-#                 st.write(res.status_code, res.content)
